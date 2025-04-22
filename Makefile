@@ -11,7 +11,7 @@ chenil: $(OBJ) //C’est la règle principale
 clean:  //Une règle spéciale pour nettoyer le projet
 	rm -f *.o chenil //Supprime tous les fichiers .o et l’exécutable chenil
 
-//Ce Makefile sert à compiler un projet C dont le programme principal s’appelle chenil. Il :
+//Ce Makefile sert à compiler un projet C dont le programme principal s’appelle chenil.
 //Compile chaque fichier .c en .o
 //Assemble tous les .o pour créer chenil
 //Permet de faire le ménage avec make clean
