@@ -1,17 +1,12 @@
-CC = gcc //définit le compilateur à utiliser
-CFLAGS = -Wall -Wextra -std=c99  //Ce sont les options de compilation
-OBJ = main.o ajouterAnimal.o animal.o id.o affichage.o rechercherAnimaux.o comparer.o nettoyeur.o adopterAnimal.o nourriture.o inventaire.o utils.o //Liste de tous les fichiers objets
+PROG = projet
 
-chenil: $(OBJ) //C’est la règle principale
-	$(CC) $(CFLAGS) -o chenil $(OBJ) //Cette ligne compile tous les .o pour créer l’exécutable chenil
+SRC = main.c
 
-%.o: %.c //Règle générique : pour chaque fichier .c, comment créer le .o correspondant
-	$(CC) $(CFLAGS) -c $< //Cette ligne compile un fichier .c en .o. et  $< représente le fichier source (le .c)
+all : $(PROG)
+	./$(PROG)
 
-clean:  //Une règle spéciale pour nettoyer le projet
-	rm -f *.o chenil //Supprime tous les fichiers .o et l’exécutable chenil
+$(PROG) : $(SRC) //fichier.h
+		gcc -Wall -o $(PROG) $(SRC)
 
-//Ce Makefile sert à compiler un projet C dont le programme principal s’appelle chenil.
-//Compile chaque fichier .c en .o
-//Assemble tous les .o pour créer chenil
-//Permet de faire le ménage avec make clean
+clean :
+	rm -f $(PROG)
