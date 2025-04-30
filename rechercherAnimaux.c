@@ -25,7 +25,7 @@ static int menuTypeAge() {
     return choix;
 }
 
-// Fonction pour afficher un résultat trouvé avec un style
+// Fonction pour afficher un résultat trouvé 
 static void afficherResultat(const Animal *a, int age) {
     printf("\n\033[1;34m=== Animal trouvé ===\033[0m\n");  // Titre bleu
     printf("\033[1;33mID\033[0m: %d\n", a->id);  // ID en jaune

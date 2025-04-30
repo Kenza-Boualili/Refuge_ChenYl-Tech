@@ -6,7 +6,7 @@ void nettoyerBuffer() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-// Comparaison manuelle sans string.h (insensible à la casse)
+// Comparaison manuelle 
 int compareStr(const char* a, const char* b) {
     int i = 0;
     while (a[i] && b[i]) {

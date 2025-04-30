@@ -1,12 +1,19 @@
-PROG = projet
+CC = gcc
+CFLAGS = -Wall -Wextra
 
-SRC = main.c
+OBJECTS = adopterAnimal.o affichage.o ajouterAnimal.o animal.o comparer.o id.o inventaire.o main.o nettoyeur.o nourriture.o rechercherAnimaux.o utils.o
 
-all : $(PROG)
-	./$(PROG)
+all: chenil.exe
 
-$(PROG) : $(SRC) //fichier.h
-		gcc -Wall -o $(PROG) $(SRC)
+chenil.exe: $(OBJECTS)
+	$(CC) $(CFLAGS) $^ -o $@
 
-clean :
-	rm -f $(PROG)
+%.o: %.c %.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+main.o: main.c
+	$(CC) $(CFLAGS) -c main.c -o main.o
+
+clean:
+	rm -f chenil.exe
+	rm -f *.o
