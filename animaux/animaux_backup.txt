@@ -2,3 +2,7 @@
 74074;fox;Chien;2015;36.00;agressif
 74032;dhh;Chat;2015;36.00;patient
 36712;sihame;Chien;2005;62.00;nul
+72933;doggy;Autruche;1963;12.00;Aucun
+73285;koul;Chat;2010;21.00;Aucun
+74359;ksd;Chat;2012;15.00;Aucun
+76089;koala;Chien;2015;12.00;Aucun
