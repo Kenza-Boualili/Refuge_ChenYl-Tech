@@ -1,37 +1,34 @@
-# Compilateur et options
+# Makefile pour structure src/include/obj/bin (OS-Agnostic Target Name)
 CC = gcc
-CFLAGS = -Wall -Wextra
-
-# Liste des fichiers objets nécessaires pour l'exécutable
-# (Utilisation de \ pour séparer sur plusieurs lignes pour la lisibilité)
-OBJECTS = adopterAnimal.o affichage.o ajouterAnimal.o \
-          animal.o comparer.o id.o inventaire.o main.o \
-          nettoyeur.o nourriture.o rechercherAnimaux.o \
-          utils.o retourmenu.o 
-
-# Nom de l'exécutable final
-TARGET = chenil.exe
-
-# Règle par défaut (celle exécutée si on tape juste "make")
-# Dépend de l'exécutable final.
+CFLAGS = -Wall -Wextra -Iinclude
+LDFLAGS =
+SRCDIR = src
+INCDIR = include
+OBJDIR = obj
+BINDIR = bin
+DATADIR = data
+SRCS_FILES = main.c animal.c affichage.c ajouterAnimal.c adopterAnimal.c \
+             rechercherAnimaux.c inventaire.c nourriture.c retourmenu.c \
+             utils.c comparer.c id.c nettoyeur.c
+SRCS = $(patsubst %,$(SRCDIR)/%,$(SRCS_FILES))
+OBJS = $(patsubst %,$(OBJDIR)/%.o,$(basename $(SRCS_FILES)))
+TARGET_NAME = chenil
+TARGET = $(BINDIR)/$(TARGET_NAME)
 all: $(TARGET)
-
-# Règle pour créer l'exécutable final à partir des fichiers objets
-# La ligne de commande DOIT commencer par une TABULATION
-$(TARGET): $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o $(TARGET)
-
-# Règle générique pour compiler un fichier .c en .o
-# Compile si le .c correspondant est plus récent que le .o
-# La ligne de commande DOIT commencer par une TABULATION
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Règle pour nettoyer les fichiers générés
-# Les lignes de commande DOIVENT commencer par une TABULATION
+$(TARGET): $(OBJS) | $(BINDIR)
+	    @echo "Linking $(TARGET)..."
+	    $(CC) $(OBJS) $(LDFLAGS) -o $@
+	    @echo "Executable $(TARGET) created."
+$(OBJDIR)/%.o: $(SRCDIR)/%.c $(wildcard $(INCDIR)/*.h) | $(OBJDIR)
+	    @echo "Compiling $<..."
+	    $(CC) $(CFLAGS) -c $< -o $@
+$(BINDIR):
+	    mkdir -p $(BINDIR)
+$(OBJDIR):
+	    mkdir -p $(OBJDIR)
 clean:
-	rm -f $(TARGET)
-	rm -f *.o
-
-# Déclarer les cibles qui ne sont pas des fichiers (bonne pratique)
+	    @echo "Cleaning build files..."
+	    rm -rf $(OBJDIR)
+	    rm -rf $(BINDIR)
+	    @echo "Clean finished."
 .PHONY: all clean
