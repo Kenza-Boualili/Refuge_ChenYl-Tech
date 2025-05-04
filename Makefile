@@ -1,4 +1,3 @@
-# Makefile pour structure src/include/obj/bin (OS-Agnostic Target Name)
 CC = gcc
 CFLAGS = -Wall -Wextra -Iinclude
 LDFLAGS =

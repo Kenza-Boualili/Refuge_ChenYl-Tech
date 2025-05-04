@@ -1,4 +1,3 @@
-// src/nettoyeur.c (Vérifié)
 #include <stdio.h>
 #include <errno.h>
 #include <sys/stat.h>
@@ -53,7 +52,7 @@ void nettoyerFichierAnimaux() {
                 printf("\n");
             }
             lignes_ignorees++;
-        } // Ajout de l'accolade manquante ici
+        } 
     }
 
     fclose(f);
@@ -67,4 +66,4 @@ void nettoyerFichierAnimaux() {
     } else {
         printf("Nettoyage OK: %d gardées, %d ignorées. Backup créé.\n", lignes_gardees, lignes_ignorees);
     }
-} // Fin de la fonction
+} 

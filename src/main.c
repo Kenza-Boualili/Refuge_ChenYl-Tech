@@ -1,13 +1,13 @@
-// main.c (Modifié pour inverser options 3 et 5)
 #include <stdio.h>
 #include "ajouterAnimal.h"
 #include "affichage.h"
 #include "rechercherAnimaux.h"
 #include "nettoyeur.h"
-#include "adopterAnimal.h"  // Header nécessaire pour adopterAnimal()
+#include "adopterAnimal.h"  
 #include "nourriture.h"
-#include "inventaire.h"     // Header nécessaire pour afficherInventaire()
+#include "inventaire.h"   
 #include "utils.h"
+
 
 #define RED "\033[91m"
 #define RESET "\033[0m"
@@ -35,13 +35,13 @@ int main() {
             case 2:
                 rechercherAnimaux();
                 break;
-            case 3: // Choix 3 appelle maintenant l'inventaire
+            case 3: 
                 afficherInventaire();
                 break;
             case 4:
                 afficherNourriture();
                 break;
-            case 5: // Choix 5 appelle maintenant l'adoption
+            case 5: 
                 adopterAnimal();
                 break;
             case 6:

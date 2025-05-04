@@ -1,12 +1,22 @@
-// include/utils.h (Corrigé)
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef UTILS_H               // Si UTILS_H n'est pas défini, 
+                              // active le code jusqu'à #endif
 
-#include <stddef.h> // Pour size_t
+#define UTILS_H               // Définit UTILS_H pour empêcher 
+                              // l'inclusion multiple du fichier
 
-int compareStr(const char *a, const char *b);
-void nettoyerBuffer();
-void enleverNewline(char *chaine, size_t taille_max);
-size_t longueurChaine(const char *chaine); // <-- AJOUTÉE
+#include <stddef.h>           // Inclusion de la bibliothèque standard pour size_t (représenter les tailles/mémoire)
 
-#endif
+int compareStr(const char *a, const char *b); // Compare deux chaînes 
+
+void nettoyerBuffer();         // Nettoie le buffer d'entrée 
+                               // Utile après un scanf() pour éviter les erreurs
+
+void enleverNewline(char *chaine, size_t taille_max); // Enlève le caractère '\n' d'une chaîne :
+                                                      // - "chaine" : chaîne à modifier
+                                                      // - "taille_max" : taille maximale 
+
+size_t longueurChaine(const char *chaine); // Calcule la longueur d'une chaîne :
+                                           // - Equivalent de strlen() (sauf que nous on utilise pas string)
+                                           // - Retourne un size_t (non négatif)
+
+#endif                        // Fin de la protection d'inclusion multiple
