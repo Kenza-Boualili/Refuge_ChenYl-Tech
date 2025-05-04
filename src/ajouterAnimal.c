@@ -34,7 +34,8 @@ void ajouterAnimal() {
         if (!fgets(input_buffer, sizeof(input_buffer), stdin)) { return; }
         enleverNewline(input_buffer, sizeof(input_buffer));
         if (input_buffer[0] == 'm' && input_buffer[1] == '\0') { return; }
-        if (input_buffer[0] == 'r' && input_buffer[1] == '\0') { printf("\nRecommencement...\n"); continue; }
+        if (input_buffer[0] == 'r' && input_buffer[1] == '\0') { 
+            printf("\nRecommencement...\n"); continue; }
         if (input_buffer[0] == '\0') {
              printf(RED "Le nom ne peut pas être vide.\n" RESET);
              printf(YELLOW_BOLD "(Rappel : Tapez 'r' pour recommencer ou 'm' pour menu.)\n" RESET);
@@ -50,10 +51,17 @@ void ajouterAnimal() {
             printf(CYAN "📅 Année de naissance (entre 1980 et %d) : " RESET, annee_actuelle);
              if (!fgets(input_buffer, sizeof(input_buffer), stdin)) { return; }
              enleverNewline(input_buffer, sizeof(input_buffer));
-             if (input_buffer[0] == 'm' && input_buffer[1] == '\0') { return; }
-             if (input_buffer[0] == 'r' && input_buffer[1] == '\0') { printf("\nRecommencement...\n"); goto recommencer_ajout_externe_aj; } // Utilise label spécifique
-             if (sscanf(input_buffer, "%d", &a.annee_naissance) == 1 && a.annee_naissance >= 1980 && a.annee_naissance <= annee_actuelle) { break; }
-             else { printf(RED "⚠️ Année invalide !\n" RESET); printf(YELLOW_BOLD "(Rappel : 'r' recommencer, 'm' menu.)\n" RESET); }
+             if (input_buffer[0] == 'm' && input_buffer[1] == '\0') 
+             { return; }
+             if (input_buffer[0] == 'r' && input_buffer[1] == '\0') { 
+                printf("\nRecommencement...\n"); 
+                goto recommencer_ajout_externe_aj; 
+            } // Utilise label spécifique
+             if (sscanf(input_buffer, "%d", &a.annee_naissance) == 1 && a.annee_naissance >= 1980 && a.annee_naissance <= annee_actuelle) { 
+                break; }
+             else { 
+                printf(RED "⚠️ Année invalide !\n" RESET); 
+                printf(YELLOW_BOLD "(Rappel : 'r' recommencer, 'm' menu.)\n" RESET); }
         }
 
         // --- Poids ---
@@ -79,7 +87,9 @@ void ajouterAnimal() {
         // --- Sauvegarde ---
         // *** CHEMIN CORRIGÉ ICI ***
         f = fopen("data/animaux/animaux.txt", "a");
-        if (!f) { printf(RED "❌ Erreur ouverture fichier '%s' !\n" RESET, "data/animaux/animaux.txt"); return; }
+        if (!f) { 
+        printf(RED "❌ Erreur ouverture fichier '%s' !\n" RESET, "data/animaux/animaux.txt"); 
+        return; }
         a.id = genererID();
         fprintf(f, "%d;%s;%s;%d;%.2f;%s\n", a.id, a.nom, especeToStr(a.espece), a.annee_naissance, a.poids, (a.commentaire[0] == '\0') ? "Aucun" : a.commentaire);
         fclose(f); f = NULL;

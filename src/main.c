@@ -13,9 +13,7 @@
 #define RESET "\033[0m"
 
 int main() {
-    // Nettoyage au démarrage (peut prendre du temps, peut être optionnel ?)
-    // Consider commenting out if startup is slow and data is known good
-    // nettoyerFichierAnimaux();
+    nettoyerFichierAnimaux();
 
     int choix;
 
