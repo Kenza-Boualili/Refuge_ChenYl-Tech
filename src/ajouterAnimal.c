@@ -1,10 +1,11 @@
-#include "animal.h"
-#include "id.h"
+#include "../include/animal.h"
+#include "../include/id.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "utils.h"
-#include "retourmenu.h"
+
+#include "../include/utils.h"
+#include "../include/retourmenu.h"
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>

@@ -1,4 +1,4 @@
-#include "comparer.h"
+#include "../include/comparer.h"
 
 int comparer(const char *s1, const char *s2) {
     int i = 0;
