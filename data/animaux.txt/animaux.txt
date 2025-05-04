@@ -1,9 +1,0 @@
-74665;masha;hamster;2001;14.00;kdhv
-74074;fox;chien;2015;36.00;agressif
-74032;dhh;chat;2015;36.00;patient
-72933;doggy;autruche;1963;12.00;Aucun
-73285;koul;chat;2010;21.00;Aucun
-74359;ksd;chat;2012;15.00;Aucun
-76089;koala;chien;2015;12.00;Aucun
-86091;kokl;chat;2016;2.00;Aucun
-90382;kiki;chat;2017;3.60;adorable
