@@ -1,107 +1,150 @@
+#include <stdio.h>      // Bibliothèque pour afficher du texte à l'écran 
+#include <stdlib.h>     // Bibliothèque pour gérer la mémoire, les conversions, les nombres aléatoires...
+#include <time.h>       // Bibliothèque pour gérer le temps 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include "animal.h"
-#include "retourmenu.h"
-#include "utils.h"
-#include "comparer.h"
+#include "animal.h"     // Fichier avec des fonctions liées aux animaux 
+#include "retourmenu.h" // Fichier avec des fonctions pour revenir au menu 
+#include "utils.h"      // Fichier contenant des fonctions utilitaires 
+#include "comparer.h"   // Fichier pour comparer des éléments
 
-// Définitions des couleurs
-#define RED_BOLD    "\033[1;31m"
-#define GREEN_BOLD  "\033[1;32m"
-#define YELLOW_BOLD "\033[1;33m"
-#define BLUE_BOLD   "\033[1;34m"
-#define CYAN_BOLD   "\033[1;36m"
-#define PINK        "\033[1;35m"
-#define GREEN       "\033[1;32m"
-#define CYAN        "\033[1;36m"
-#define RED         "\033[1;31m"
-#define WHITE       "\033[1;37m"
-#define RESET       "\033[0m"
+#define RED_BOLD    "\033[1;31m"  // Texte en rouge et en gras
+#define GREEN_BOLD  "\033[1;32m"  // Texte en vert et en gras
+#define YELLOW_BOLD "\033[1;33m"  // Texte en jaune et en gras
+#define BLUE_BOLD   "\033[1;34m"  // Texte en bleu et en gras
+#define CYAN_BOLD   "\033[1;36m"  // Texte cyan et en gras
+
+#define PINK        "\033[1;35m"  // Texte en rose
+#define GREEN       "\033[1;32m"  // Texte en vert
+#define CYAN        "\033[1;36m"  // Texte cyan
+#define RED         "\033[1;31m"  // Texte en rouge
+#define WHITE       "\033[1;37m"  // Texte en blanc
+
+#define RESET       "\033[0m"     // Revient à la couleur normale
 
 
-static int calculerAgeAdopter(int annee_naissance) {
-    if (annee_naissance <= 0) {
-        return -2;
+static int calculerAgeAdopter(int annee_naissance) { 
+    if (annee_naissance <= 0) { // Si l'année de naissance est inférieure ou égale à 0, ce n'est pas valide
+        return -2; // Code d'erreur : année invalide
     }
     
-    time_t maintenant = time(NULL);
+    time_t maintenant = time(NULL);// Récupère l'heure actuelle (en secondes depuis 1970)
+
+    // Convertit cette heure en une structure contenant la date locale (jour, mois et anné)
     struct tm *tm = localtime(&maintenant);
+
+    // Si la conversion échoue (tm est NULL) on retourne une erreur
     if (tm == NULL) {
-        return -1;
+        return -1; // Code d'erreur 
     }
     
+    // tm_year donne l'année actuelle - 1900 donc on ajoute 1900 pour avoir l'année réelle
     int annee_actuelle = tm->tm_year + 1900;
+
+    // Vérifie si l'année de naissance est supérieure à l'année actuelle
+    // ou si elle est trop ancienne (avant 1900)
     if (annee_naissance > annee_actuelle || annee_naissance < 1900) {
-        return -2;
+        return -2; // année incohérente
     }
-    
+
+    // Si tout est correct, on calcule l'âge en faisant la différence entre l'année actuelle et l'année de naissance
     return annee_actuelle - annee_naissance;
 }
 
 void adopterAnimal() {
+    // Déclare deux pointeurs de fichiers, un pour lire (f_in) et l’autre pour écrire (f_out)
     FILE *f_in = NULL, *f_out = NULL;
+
+    // Une zone mémoire pour stocker du texte tapé par l'utilisateur (un nom ou un choix)
     char input_buffer[TAILLE_NOM + 10];
+
+    // Variable qui contient l’identifiant de l’animal à adopter
     int id_a_adopter = -1;
+
+    // Variable pour stocker le choix de l’utilisateur entre plusieurs méthodes d’adoption
     int choix_methode = 0;
+
+    // Booléen pour savoir si l’adoption est terminée
     int adoption_terminee = 0;
+
+    // Une chaîne de caractères utilisée pour lire une ligne depuis un fichier
     char ligne[512];
+
+    // Tableau pour stocker des animaux qui correspondent aux critères de l’utilisateur
     Animal correspondances[MAX_ANIMAUX];
+
+    // Compteur pour savoir combien de correspondances ont été trouvées
     int nb_correspondances = 0;
+
+    // Variable temporaire pour stocker un animal lu ou manipulé temporairement
     Animal temp_animal;
+
+    // Chaîne temporaire pour stocker l’espèce de l’animal 
     char temp_espece_str[50];
+
+    // Chaîne temporaire pour stocker un commentaire sur l’animal
     char temp_comment_str[TAILLE_COMM];
+}
 
-    while (!adoption_terminee) {
-        id_a_adopter = -1;
-        nb_correspondances = 0;
+    while (!adoption_terminee) {  // Tant que l'adoption n'est pas terminée, on continue la boucle.
+    id_a_adopter = -1;  // On réinitialise l'ID de l'animal à adopter à -1
+    nb_correspondances = 0;  // On réinitialise le nombre de correspondances trouvées à 0
 
-        printf(BLUE_BOLD "\n=== Adopter un Animal ===\n" RESET);
-        printf("Comment identifier l'animal ?\n1. Par ID\n2. Par Nom\n Tapez 'm' pour menu principal.\n");
-        printf(CYAN_BOLD "Choix : " RESET);
+    printf(BLUE_BOLD "\n=== Adopter un Animal ===\n" RESET);  // Affiche le titre du menu en bleu gras.
+    printf("Comment identifier l'animal ?\n1. Par ID\n2. Par Nom\n Tapez 'm' pour menu principal.\n");  // Affiche les options pour identifier l'animal
+    printf(CYAN_BOLD "Choix : " RESET);  // Affiche un message pour que l'utilisateur entre son choix.
 
-        if (!fgets(input_buffer, sizeof(input_buffer), stdin)) {
-            return;
-        }
-        enleverNewline(input_buffer, sizeof(input_buffer));
-        
-        if (input_buffer[0] == 'm' && input_buffer[1] == '\0') {
-            return;
-        }
-        
-        if (sscanf(input_buffer, "%d", &choix_methode) != 1 || (choix_methode != 1 && choix_methode != 2)) {
-            printf(RED_BOLD "❌ Choix invalide (1 ou 2).\n" RESET);
-            printf(YELLOW_BOLD "(Rappel: 'm' menu.)\n" RESET);
-            continue;
-        }
+    // Lit la ligne entrée par l'utilisateur dans 'input_buffer'.
+    if (!fgets(input_buffer, sizeof(input_buffer), stdin)) {
+        return;  // Si la lecture échoue, on quitte la fonction.
+    }
 
-        if (choix_methode == 1) { // Par ID
-            printf(YELLOW_BOLD "Entrez l'ID ('r' retour, 'm' menu) : " RESET);
-            if (!fgets(input_buffer, sizeof(input_buffer), stdin)) {
-                return;
-            }
-            enleverNewline(input_buffer, sizeof(input_buffer));
-            
-            if (input_buffer[0] == 'm' && input_buffer[1] == '\0') {
-                return;
-            }
-            if (input_buffer[0] == 'r' && input_buffer[1] == '\0') {
-                continue;
-            }
-            
-            if (sscanf(input_buffer, "%d", &id_a_adopter) != 1 || id_a_adopter <= 0) {
-                printf(RED_BOLD "❌ ID invalide.\n" RESET);
-                printf(YELLOW_BOLD "(Rappel: 'r' retour, 'm' menu.)\n" RESET);
-                continue;
-            }
-            printf(GREEN_BOLD "Recherche ID %d...\n" RESET, id_a_adopter);
-        } else { // Par Nom
-            printf(YELLOW_BOLD "Entrez le Nom ('r' retour, 'm' menu) : " RESET);
-            if (!fgets(input_buffer, sizeof(input_buffer), stdin)) {
-                return;
-            }
-            enleverNewline(input_buffer, sizeof(input_buffer));
+    enleverNewline(input_buffer, sizeof(input_buffer));  // Supprime le caractère de nouvelle ligne ('\n') à la fin de l'entrée, si présent
+
+    // Si l'utilisateur tape 'm' et appuie sur 'Entrée', on quitte la fonction pour retourner au menu principal.
+    if (input_buffer[0] == 'm' && input_buffer[1] == '\0') {
+        return;
+    }
+
+    // Vérifie si l'utilisateur a bien entré un nombre entier et si ce nombre est soit 1 soit 2.
+    if (sscanf(input_buffer, "%d", &choix_methode) != 1 || (choix_methode != 1 && choix_methode != 2)) {
+        printf(RED_BOLD "❌ Choix invalide (1 ou 2).\n" RESET);  // Si le choix est invalide, affiche un message d'erreur en rouge gras.
+        printf(YELLOW_BOLD "(Rappel: 'm' menu.)\n" RESET);  // Rappelle à l'utilisateur qu'il peut taper 'm' pour revenir au menu.
+        continue;  // Continue la boucle pour permettre à l'utilisateur de réessayer.
+    }
+}
+
+
+    if (choix_methode == 1) {  // Si l'utilisateur a choisi l'option 1 donc chercher par ID
+    printf(YELLOW_BOLD "Entrez l'ID ('r' retour, 'm' menu) : " RESET);  // Demande à l'utilisateur de saisir l'ID de l'animal
+    if (!fgets(input_buffer, sizeof(input_buffer), stdin)) {  // Lit l'entrée de l'utilisateur
+        return;  // Si la lecture échoue, quitte la fonction
+    }
+    enleverNewline(input_buffer, sizeof(input_buffer));  // Enlève le caractère de nouvelle ligne à la fin de l'entrée
+
+    if (input_buffer[0] == 'm' && input_buffer[1] == '\0') {  // Si l'utilisateur tape 'm' on retourne au menu
+        return;
+    }
+    if (input_buffer[0] == 'r' && input_buffer[1] == '\0') {  // Si l'utilisateur tape 'r' on retourne à l'étape précédente
+        continue;
+    }
+
+    // Vérifie si l'utilisateur a saisi un ID valide (positif)
+    if (sscanf(input_buffer, "%d", &id_a_adopter) != 1 || id_a_adopter <= 0) {
+        printf(RED_BOLD "❌ ID invalide.\n" RESET);  // Si l'ID est invalide, affiche un message d'erreur en rouge
+        printf(YELLOW_BOLD "(Rappel: 'r' retour, 'm' menu.)\n" RESET);  // Rappelle à l'utilisateur qu'il peut taper 'r' ou 'm'
+        continue;  // Reprend la boucle pour que l'utilisateur réessaie
+    }
+
+    // Si l'ID est valide, affiche un message indiquant qu'on va rechercher l'animal avec cet ID
+    printf(GREEN_BOLD "Recherche ID %d...\n" RESET, id_a_adopter);
+} else {  // Sinon, si l'utilisateur a choisi de chercher par nom
+    printf(YELLOW_BOLD "Entrez le Nom ('r' retour, 'm' menu) : " RESET);  // Demande à l'utilisateur de saisir le nom de l'animal
+    if (!fgets(input_buffer, sizeof(input_buffer), stdin)) {  // Lit l'entrée de l'utilisateur
+        return;  // Si la lecture échoue on quitte la fonction
+    }
+    enleverNewline(input_buffer, sizeof(input_buffer));  // Enlève le caractère de nouvelle ligne à la fin de l'entrée
+ }
+
             
             if (input_buffer[0] == 'm' && input_buffer[1] == '\0') {
                 return;
