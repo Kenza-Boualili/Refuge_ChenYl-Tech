@@ -1,107 +1,130 @@
+#include <stdio.h>      
+#include <stdlib.h>     
+#include <time.h>       
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include "animal.h"
+#include "animal.h"    
 #include "retourmenu.h"
-#include "utils.h"
-#include "comparer.h"
+#include "utils.h"      
+#include "comparer.h"   
 
-// Définitions des couleurs
-#define RED_BOLD    "\033[1;31m"
-#define GREEN_BOLD  "\033[1;32m"
-#define YELLOW_BOLD "\033[1;33m"
-#define BLUE_BOLD   "\033[1;34m"
-#define CYAN_BOLD   "\033[1;36m"
-#define PINK        "\033[1;35m"
-#define GREEN       "\033[1;32m"
-#define CYAN        "\033[1;36m"
-#define RED         "\033[1;31m"
-#define WHITE       "\033[1;37m"
-#define RESET       "\033[0m"
+#define RED_BOLD    "\033[1;31m"  
+#define GREEN_BOLD  "\033[1;32m"  
+#define YELLOW_BOLD "\033[1;33m"  
+#define BLUE_BOLD   "\033[1;34m" 
+#define CYAN_BOLD   "\033[1;36m"  
+
+#define PINK        "\033[1;35m"  
+#define GREEN       "\033[1;32m"  
+#define CYAN        "\033[1;36m"  
+#define RED         "\033[1;31m"  
+#define WHITE       "\033[1;37m"  
+
+#define RESET       "\033[0m"     
 
 
-static int calculerAgeAdopter(int annee_naissance) {
-    if (annee_naissance <= 0) {
-        return -2;
+static int calculerAgeAdopter(int annee_naissance) { 
+    if (annee_naissance <= 0) { 
+        return -2; 
     }
     
     time_t maintenant = time(NULL);
+
     struct tm *tm = localtime(&maintenant);
+
+    
     if (tm == NULL) {
-        return -1;
+        return -1; 
     }
     
     int annee_actuelle = tm->tm_year + 1900;
+
     if (annee_naissance > annee_actuelle || annee_naissance < 1900) {
-        return -2;
+        return -2; 
     }
-    
+
     return annee_actuelle - annee_naissance;
 }
 
 void adopterAnimal() {
     FILE *f_in = NULL, *f_out = NULL;
+
     char input_buffer[TAILLE_NOM + 10];
+
     int id_a_adopter = -1;
+
     int choix_methode = 0;
+
     int adoption_terminee = 0;
+
     char ligne[512];
+
     Animal correspondances[MAX_ANIMAUX];
+
     int nb_correspondances = 0;
+
     Animal temp_animal;
+
     char temp_espece_str[50];
+
+ 
     char temp_comment_str[TAILLE_COMM];
+}
 
-    while (!adoption_terminee) {
-        id_a_adopter = -1;
-        nb_correspondances = 0;
+    while (!adoption_terminee) {  
+    id_a_adopter = -1;
+    nb_correspondances = 0;  
 
-        printf(BLUE_BOLD "\n=== Adopter un Animal ===\n" RESET);
-        printf("Comment identifier l'animal ?\n1. Par ID\n2. Par Nom\n Tapez 'm' pour menu principal.\n");
-        printf(CYAN_BOLD "Choix : " RESET);
+    printf(BLUE_BOLD "\n=== Adopter un Animal ===\n" RESET); 
+    printf("Comment identifier l'animal ?\n1. Par ID\n2. Par Nom\n Tapez 'm' pour menu principal.\n");  
+    printf(CYAN_BOLD "Choix : " RESET); 
+    
+    if (!fgets(input_buffer, sizeof(input_buffer), stdin)) {
+        return;
+    }
 
-        if (!fgets(input_buffer, sizeof(input_buffer), stdin)) {
-            return;
-        }
-        enleverNewline(input_buffer, sizeof(input_buffer));
+    enleverNewline(input_buffer, sizeof(input_buffer)); 
+    
+    if (input_buffer[0] == 'm' && input_buffer[1] == '\0') {
+        return;
+    }
+
+    
+    if (sscanf(input_buffer, "%d", &choix_methode) != 1 || (choix_methode != 1 && choix_methode != 2)) {
+        printf(RED_BOLD "❌ Choix invalide (1 ou 2).\n" RESET);  
+        printf(YELLOW_BOLD "(Rappel: 'm' menu.)\n" RESET);  
+        continue;  
+    }
+}
+
+
+    if (choix_methode == 1) { 
+    printf(YELLOW_BOLD "Entrez l'ID ('r' retour, 'm' menu) : " RESET); 
+    if (!fgets(input_buffer, sizeof(input_buffer), stdin)) {  
+        return;  // Si la lecture échoue, quitte la fonction
+    }
+    enleverNewline(input_buffer, sizeof(input_buffer));  
+    if (input_buffer[0] == 'm' && input_buffer[1] == '\0') { 
+        return;
+    }
+    if (input_buffer[0] == 'r' && input_buffer[1] == '\0') { 
+        continue;
+    }
+
+    if (sscanf(input_buffer, "%d", &id_a_adopter) != 1 || id_a_adopter <= 0) {
+        printf(RED_BOLD "❌ ID invalide.\n" RESET); 
+        printf(YELLOW_BOLD "(Rappel: 'r' retour, 'm' menu.)\n" RESET);  
+        continue; 
+    }
         
-        if (input_buffer[0] == 'm' && input_buffer[1] == '\0') {
-            return;
-        }
-        
-        if (sscanf(input_buffer, "%d", &choix_methode) != 1 || (choix_methode != 1 && choix_methode != 2)) {
-            printf(RED_BOLD "❌ Choix invalide (1 ou 2).\n" RESET);
-            printf(YELLOW_BOLD "(Rappel: 'm' menu.)\n" RESET);
-            continue;
-        }
+        printf(GREEN_BOLD "Recherche ID %d...\n" RESET, id_a_adopter);
+} else { 
+    printf(YELLOW_BOLD "Entrez le Nom ('r' retour, 'm' menu) : " RESET); 
+    if (!fgets(input_buffer, sizeof(input_buffer), stdin)) { 
+        return;  
+    }
+    enleverNewline(input_buffer, sizeof(input_buffer)); 
+ }
 
-        if (choix_methode == 1) { // Par ID
-            printf(YELLOW_BOLD "Entrez l'ID ('r' retour, 'm' menu) : " RESET);
-            if (!fgets(input_buffer, sizeof(input_buffer), stdin)) {
-                return;
-            }
-            enleverNewline(input_buffer, sizeof(input_buffer));
-            
-            if (input_buffer[0] == 'm' && input_buffer[1] == '\0') {
-                return;
-            }
-            if (input_buffer[0] == 'r' && input_buffer[1] == '\0') {
-                continue;
-            }
-            
-            if (sscanf(input_buffer, "%d", &id_a_adopter) != 1 || id_a_adopter <= 0) {
-                printf(RED_BOLD "❌ ID invalide.\n" RESET);
-                printf(YELLOW_BOLD "(Rappel: 'r' retour, 'm' menu.)\n" RESET);
-                continue;
-            }
-            printf(GREEN_BOLD "Recherche ID %d...\n" RESET, id_a_adopter);
-        } else { // Par Nom
-            printf(YELLOW_BOLD "Entrez le Nom ('r' retour, 'm' menu) : " RESET);
-            if (!fgets(input_buffer, sizeof(input_buffer), stdin)) {
-                return;
-            }
-            enleverNewline(input_buffer, sizeof(input_buffer));
             
             if (input_buffer[0] == 'm' && input_buffer[1] == '\0') {
                 return;
