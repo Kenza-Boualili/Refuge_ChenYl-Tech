@@ -2,3 +2,5 @@
 59381;you;Autruche;2014;48.00;Aucun
 66110;toj;Autruche;2013;12.00;Aucun
 66281;12;Chat;2025;21.00;Aucun
+81551;JDN;Chat;2014;12.00;sympa
+81610;o;Chat;2014;12.00;kp
