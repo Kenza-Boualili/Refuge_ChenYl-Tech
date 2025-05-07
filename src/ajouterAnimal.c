@@ -154,3 +154,4 @@ void ajouterAnimal() {
     recommencer_ajout_complet:;
     }
 }
+
