@@ -185,7 +185,4 @@ void afficherInventaire() {
     printf(VERT "-----------------------------\n" REINITIALISER);
 }
 
-    printf(GREEN "-----------------------------\n" RESET);
-    printf(PINK "Total général : %d animaux.\n" RESET, nb_animaux);
-    printf(GREEN "-----------------------------\n" RESET);
-}
+   
