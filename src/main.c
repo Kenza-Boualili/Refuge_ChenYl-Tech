@@ -8,25 +8,24 @@
 #include "inventaire.h"   
 #include "utils.h"
 
-
-#define RED "\033[91m"
-#define RESET "\033[0m"
+#define ROUGE "\033[91m"
+#define REINITIALISER "\033[0m"
 
 int main() {
-    nettoyerFichierAnimaux();
+    nettoyerFichierAnimaux();  // Nettoie les données corrompues au démarrage
 
     int choix;
 
     do {
-        afficherMenu(); // Affiche le nouveau menu
+        afficherMenu(); // Affiche le menu principal
 
         if (scanf("%d", &choix) != 1) {
-            printf(RED "Erreur : Veuillez entrer un numéro valide.\n" RESET);
-            nettoyerBuffer();
+            printf(ROUGE "Erreur : veuillez entrer un numéro valide.\n" REINITIALISER);
+            nettoyerTampon(); // vide le tampon d’entrée
             choix = 0;
             continue;
         }
-        nettoyerBuffer();
+        nettoyerTampon();
 
         switch (choix) {
             case 1:
@@ -48,7 +47,7 @@ int main() {
                 printf(" Au revoir ! 👋\n");
                 break;
             default:
-                printf(RED " Choix invalide !\n" RESET);
+                printf(ROUGE "Choix invalide !\n" REINITIALISER);
         }
 
     } while (choix != 6);
