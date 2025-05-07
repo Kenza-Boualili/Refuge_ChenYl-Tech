@@ -6,13 +6,20 @@
 #include "comparer.h"
 #include "utils.h"
 
-int especeValide(const char* espece) { 
-    return comparer(espece,"Chien")||comparer(espece,"Chat")||comparer(espece,"Hamster")||comparer(espece,"Autruche"); 
+// Vérifie si l'espèce est reconnue parmi les espèces valides
+int especeValide(const char* espece) {
+    return comparer(espece, "Chien")
+        || comparer(espece, "Chat")
+        || comparer(espece, "Hamster")
+        || comparer(espece, "Autruche");
 }
 
+// Nettoie le fichier des animaux en supprimant les lignes invalides
 void nettoyerFichierAnimaux() {
-    printf("\nNettoyage fichier animaux...\n"); 
-    mkdir("data", 0755); 
+    printf("\nNettoyage du fichier des animaux...\n");
+
+    // Création des dossiers si nécessaire
+    mkdir("data", 0755);
     mkdir("data/animaux", 0755);
 
     FILE *f = fopen("data/animaux/animaux.txt", "r");
@@ -23,8 +30,8 @@ void nettoyerFichierAnimaux() {
 
     FILE *backup = fopen("data/animaux/animaux_backup.txt", "w");
     FILE *temp = fopen("data/animaux/animaux_temp.txt", "w");
-    if (!backup || !temp) { 
-        printf("Err temp/backup\n");
+    if (!backup || !temp) {
+        printf("Erreur lors de la création des fichiers temporaires/backup.\n");
         if (f) fclose(f);
         if (backup) fclose(backup);
         if (temp) fclose(temp);
@@ -38,12 +45,14 @@ void nettoyerFichierAnimaux() {
     int lignes_ignorees = 0;
 
     while (fgets(ligne, sizeof(ligne), f)) {
-        fputs(ligne, backup);
-        char id[11], n[50], e[30], an[10], p[20], c[256];
-        c[0] = '\0';
-        int nb = sscanf(ligne, "%10[^;];%49[^;];%29[^;];%9[^;];%19[^;];%255[^\n]", id, n, e, an, p, c);
+        fputs(ligne, backup);  // Sauvegarde la ligne dans l'autre fichier'
+        char id[11], nom[50], espece[30], annee[10], poids[20], commentaire[256];
+        commentaire[0] = '\0';
 
-        if (nb >= 5 && especeValide(e)) {
+        int nb = sscanf(ligne, "%10[^;];%49[^;];%29[^;];%9[^;];%19[^;];%255[^\n]",
+                        id, nom, espece, annee, poids, commentaire);
+
+        if (nb >= 5 && especeValide(espece)) {
             fputs(ligne, temp);
             lignes_gardees++;
         } else if (longueurChaine(ligne) > 0) {
@@ -52,18 +61,19 @@ void nettoyerFichierAnimaux() {
                 printf("\n");
             }
             lignes_ignorees++;
-        } 
+        }
     }
 
     fclose(f);
     fclose(backup);
     fclose(temp);
 
+    // Remplace l'ancien fichier par le nettoyé
     if (remove("data/animaux/animaux.txt") != 0) {
-        printf("Err remove\n");
+        printf("Erreur lors de la suppression de l'ancien fichier.\n");
     } else if (rename("data/animaux/animaux_temp.txt", "data/animaux/animaux.txt") != 0) {
-        printf("Err rename\n");
+        printf("Erreur lors du renommage du fichier nettoyé.\n");
     } else {
-        printf("Nettoyage OK: %d gardées, %d ignorées. Backup créé.\n", lignes_gardees, lignes_ignorees);
+        printf("Nettoyage terminé : %d ligne(s) gardée(s), %d ignorée(s). Backup créé.\n", lignes_gardees, lignes_ignorees);
     }
-} 
+}
