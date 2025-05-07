@@ -8,279 +8,201 @@
 #include "../include/affichage.h"  
 
 
-#ifndef RESET 
-#define RESET       "\033[0m"
-#define GRAS_ROUGE  "\033[1;31m"
-#define GRAS_VERT   "\033[1;32m"
-#define GRAS_JAUNE  "\033[1;33m"
-#define GRAS_BLEU   "\033[1;34m"
-#define GRAS_CYAN   "\033[1;36m"
-#define GRAS_MAUVE  "\033[1;35m"
-
-#define GRAS_BLANC  "\033[1;37m"
+#ifndef REINITIALISER 
+#define REINITIALISER       "\033[0m"
+#define ROUGE_GRAS          "\033[1;31m"
+#define VERT_GRAS           "\033[1;32m"
+#define JAUNE_GRAS          "\033[1;33m"
+#define BLEU_GRAS           "\033[1;34m"
+#define CYAN_GRAS           "\033[1;36m"
+#define MAUVE_GRAS          "\033[1;35m"
+#define BLANC_GRAS          "\033[1;37m"
 #endif
 
 #define CHEMIN_FICHIER_ANIMAUX "data/animaux/animaux.txt"
 
-#define SCANF_NOM_WIDTH "49"   
-#define SCANF_COMM_WIDTH "255"  
-#define SCANF_ESPECE_WIDTH "49" 
-
-
+// Calcule l’âge à partir de l’année de naissance
 static int calculerAge(int annee_naissance) {
-    if (annee_naissance <= 0) {
-        return -2;
-    }
+    if (annee_naissance <= 0) return -2;
+
     time_t maintenant = time(NULL);
-    if (maintenant == ((time_t)-1)) {
-         perror(GRAS_ROUGE "Erreur time() dans calculerAge" RESET);
-         return -1;
-    }
-    struct tm *tm_local = localtime(&maintenant);
-    if (tm_local == NULL) {
-        fprintf(stderr, GRAS_ROUGE "Erreur localtime() dans calculerAge\n" RESET);
-        return -1; 
-    }
-    int annee_actuelle = tm_local->tm_year + 1900;
-    if (annee_naissance > annee_actuelle || annee_naissance < 1950) { 
-        return -2; 
-    }
+    struct tm *tm_info = localtime(&maintenant);
+    if (!tm_info) return -1;
+
+    int annee_actuelle = tm_info->tm_year + 1900;
+    if (annee_naissance > annee_actuelle || annee_naissance < 1950) return -2;
+
     return annee_actuelle - annee_naissance;
 }
 
 void rechercherAnimaux() {
     FILE *fichier = NULL;
-    int choix_mode_recherche;
-    char buffer_lecture[512];
-    Animal animal_courant;
-    char buffer_espece_str[50];
-    char buffer_commentaire_str[TAILLE_COMM];
-
+    int choix;
+    char tampon[512];
+    Animal animal;
+    char espece_temp[50];
+    char commentaire_temp[TAILLE_COMM];
 
     while (1) {
-        printf("\n" GRAS_CYAN "--- 🔍 Mode Recherche 🐾 ---\n" RESET);
-       
-        printf(GRAS_BLANC "1. Par ID unique 🆔\n" RESET);    // Blanc
-        printf(GRAS_MAUVE "2. Par Nom (affiche tous les matchs) 📛\n" RESET); // Mauve
-        printf(GRAS_JAUNE  "3. Par Catégorie d'âge ⏳\n" RESET); // Jaune
-        // Instructions
-        printf(GRAS_JAUNE "➡️ Tapez 'm' pour retourner au menu principal.\n" RESET);
-        printf(GRAS_BLEU "Votre choix : " RESET);
+        printf("\n" CYAN_GRAS "--- 🔍 Mode de Recherche ---\n" REINITIALISER);
+        printf(BLANC_GRAS "1. Par ID 🆔\n" REINITIALISER);
+        printf(MAUVE_GRAS "2. Par Nom 📛\n" REINITIALISER);
+        printf(JAUNE_GRAS "3. Par Catégorie d’âge ⏳\n" REINITIALISER);
+        printf(JAUNE_GRAS "➡️ Tapez 'm' pour retourner au menu principal.\n" REINITIALISER);
+        printf(BLEU_GRAS "Votre choix : " REINITIALISER);
 
-        if (!fgets(buffer_lecture, sizeof(buffer_lecture), stdin)) {
-            fprintf(stderr, GRAS_ROUGE "\nErreur fatale lecture stdin.\n" RESET);
-            return;
-        }
-        enleverNewline(buffer_lecture, sizeof(buffer_lecture));
+        if (!fgets(tampon, sizeof(tampon), stdin)) return;
+        enleverSautLigne(tampon, sizeof(tampon));
 
-        // Option 'm'
-        if ((buffer_lecture[0] == 'm' || buffer_lecture[0] == 'M') && buffer_lecture[1] == '\0') {
-             printf(GRAS_VERT "\nRetour au menu principal...\n" RESET);
-             return;
-        }
+        if ((tampon[0] == 'm' || tampon[0] == 'M') && tampon[1] == '\0') return;
 
-        // Validation choix
-        if (sscanf(buffer_lecture, "%d", &choix_mode_recherche) != 1 || choix_mode_recherche < 1 || choix_mode_recherche > 3) {
-            printf(GRAS_ROUGE "❌ Choix invalide. Entrez 1, 2, 3 ou 'm'.\n" RESET);
+        if (sscanf(tampon, "%d", &choix) != 1 || choix < 1 || choix > 3) {
+            printf(ROUGE_GRAS "❌ Choix invalide. Entrez 1, 2, 3 ou 'm'.\n" REINITIALISER);
             continue;
         }
 
         fichier = fopen(CHEMIN_FICHIER_ANIMAUX, "r");
         if (!fichier) {
-            fprintf(stderr, GRAS_ROUGE "\n❌ Erreur ouverture fichier '%s': " RESET, CHEMIN_FICHIER_ANIMAUX);
-            perror("");
-            printf(GRAS_JAUNE "   Vérifiez existence et permissions.\n" RESET);
-            printf(GRAS_JAUNE "Appuyez sur Entrée..." RESET);
-            nettoyerBuffer();
+            printf(ROUGE_GRAS "\n❌ Erreur : impossible d’ouvrir le fichier.\n" REINITIALISER);
             continue;
         }
 
         int trouve = 0;
-        int action_terminee = 0;
-        int ligne_actuelle; 
-        switch (choix_mode_recherche) {
 
+        switch (choix) {
             case 1: {
-                printf(GRAS_BLEU "\nRecherche par ID 🆔\n" RESET);
-                printf(GRAS_JAUNE "➡️ ID exact ('r' retour, 'm' menu) : " RESET);
+                printf(BLEU_GRAS "\nRecherche par ID 🆔\n" REINITIALISER);
+                printf(JAUNE_GRAS "➡️ Entrez l’ID ('r' retour, 'm' menu) : " REINITIALISER);
+                if (!fgets(tampon, sizeof(tampon), stdin)) { fclose(fichier); return; }
+                enleverSautLigne(tampon, sizeof(tampon));
 
-                if (!fgets(buffer_lecture, sizeof(buffer_lecture), stdin)) { fclose(fichier); return; }
-                enleverNewline(buffer_lecture, sizeof(buffer_lecture));
-
-                if ((buffer_lecture[0] == 'm' || buffer_lecture[0] == 'M') && buffer_lecture[1] == '\0') { fclose(fichier); return; }
-                if ((buffer_lecture[0] == 'r' || buffer_lecture[0] == 'R') && buffer_lecture[1] == '\0') { fclose(fichier); continue; }
+                if ((tampon[0] == 'm' || tampon[0] == 'M') && tampon[1] == '\0') { fclose(fichier); return; }
+                if ((tampon[0] == 'r' || tampon[0] == 'R') && tampon[1] == '\0') { fclose(fichier); continue; }
 
                 int idRecherche;
-                if (sscanf(buffer_lecture, "%d", &idRecherche) != 1 || idRecherche <= 0) {
-                    printf(GRAS_ROUGE "❌ ID invalide (nombre positif requis).\n" RESET);
-                    fclose(fichier); continue;
+                if (sscanf(tampon, "%d", &idRecherche) != 1 || idRecherche <= 0) {
+                    printf(ROUGE_GRAS "❌ ID invalide.\n" REINITIALISER);
+                    fclose(fichier);
+                    continue;
                 }
 
-                printf(GRAS_VERT "Recherche ID %d...\n" RESET, idRecherche);
-                ligne_actuelle = 0; 
+                while (fgets(tampon, sizeof(tampon), fichier)) {
+                    commentaire_temp[0] = '\0';
+                    int lus = sscanf(tampon, "%d;%49[^;];%49[^;];%d;%f;%255[^\n]",
+                                     &animal.id, animal.nom, espece_temp,
+                                     &animal.annee_naissance, &animal.poids, commentaire_temp);
 
-                while (fgets(buffer_lecture, sizeof(buffer_lecture), fichier)) {
-                    ligne_actuelle++;
-                    buffer_commentaire_str[0] = '\0';
-                    int champs_lus = sscanf(buffer_lecture, "%d;%" SCANF_NOM_WIDTH "[^;];%" SCANF_ESPECE_WIDTH "[^;];%d;%f;%" SCANF_COMM_WIDTH "[^\n]",
-                               &animal_courant.id, animal_courant.nom, buffer_espece_str,
-                               &animal_courant.annee_naissance, &animal_courant.poids, buffer_commentaire_str);
-
-                    if (champs_lus >= 5) {
-                        if (animal_courant.id == idRecherche) {
-                            animal_courant.espece = strToEspece(buffer_espece_str);
-                            snprintf(animal_courant.commentaire, TAILLE_COMM, "%s", buffer_commentaire_str);
-                            enleverNewline(animal_courant.commentaire, TAILLE_COMM);
-                            int age = calculerAge(animal_courant.annee_naissance);
-                            afficherResultat(&animal_courant, age);
-                            trouve = 1;
-                            break;
-                        }
-                    } else if (buffer_lecture[0] != '\n' && buffer_lecture[0] != '\0') {
-                        printf(GRAS_JAUNE "⚠️ Ligne %d mal formatée ignorée (Recherche ID).\n" RESET, ligne_actuelle);
+                    if (lus >= 5 && animal.id == idRecherche) {
+                        animal.espece = chaineVersEspece(espece_temp);
+                        snprintf(animal.commentaire, TAILLE_COMM, "%s", commentaire_temp);
+                        enleverSautLigne(animal.commentaire, TAILLE_COMM);
+                        int age = calculerAge(animal.annee_naissance);
+                        afficherResultat(&animal, age);
+                        trouve = 1;
+                        break;
                     }
                 }
 
                 if (!trouve) {
-                    printf(GRAS_JAUNE "❓ ID %d non trouvé.\n" RESET, idRecherche);
+                    printf(JAUNE_GRAS "❓ ID %d non trouvé.\n" REINITIALISER, idRecherche);
                 }
-                action_terminee = 1;
-                break; 
+                break;
             }
 
             case 2: {
-                printf(GRAS_BLEU "\nRecherche par Nom 📛\n" RESET);
-                printf(GRAS_JAUNE "➡️ Nom ('r' retour, 'm' menu) : " RESET);
+                printf(BLEU_GRAS "\nRecherche par Nom 📛\n" REINITIALISER);
+                printf(JAUNE_GRAS "➡️ Nom recherché ('r' retour, 'm' menu) : " REINITIALISER);
+                if (!fgets(tampon, sizeof(tampon), stdin)) { fclose(fichier); return; }
+                enleverSautLigne(tampon, sizeof(tampon));
 
-                if (!fgets(buffer_lecture, sizeof(buffer_lecture), stdin)) { fclose(fichier); return; }
-                enleverNewline(buffer_lecture, sizeof(buffer_lecture));
+                if ((tampon[0] == 'm' || tampon[0] == 'M') && tampon[1] == '\0') { fclose(fichier); return; }
+                if ((tampon[0] == 'r' || tampon[0] == 'R') && tampon[1] == '\0') { fclose(fichier); continue; }
 
-                if ((buffer_lecture[0] == 'm' || buffer_lecture[0] == 'M') && buffer_lecture[1] == '\0') { fclose(fichier); return; }
-                if ((buffer_lecture[0] == 'r' || buffer_lecture[0] == 'R') && buffer_lecture[1] == '\0') { fclose(fichier); continue; }
-
-                if (buffer_lecture[0] == '\0') {
-                    printf(GRAS_ROUGE "❌ Nom vide.\n" RESET);
+                if (tampon[0] == '\0') {
+                    printf(ROUGE_GRAS "❌ Nom vide.\n" REINITIALISER);
                     fclose(fichier); continue;
                 }
 
                 char nomRecherche[TAILLE_NOM];
-                snprintf(nomRecherche, TAILLE_NOM, "%.*s", (int)(TAILLE_NOM - 1), buffer_lecture);
+                snprintf(nomRecherche, sizeof(nomRecherche), "%.*s", (int)(TAILLE_NOM - 1), tampon);
 
-                printf(GRAS_VERT "Recherche '%s'...\n" RESET, nomRecherche);
-                ligne_actuelle = 0; 
+                while (fgets(tampon, sizeof(tampon), fichier)) {
+                    commentaire_temp[0] = '\0';
+                    int lus = sscanf(tampon, "%d;%49[^;];%49[^;];%d;%f;%255[^\n]",
+                                     &animal.id, animal.nom, espece_temp,
+                                     &animal.annee_naissance, &animal.poids, commentaire_temp);
 
-                while (fgets(buffer_lecture, sizeof(buffer_lecture), fichier)) {
-                    ligne_actuelle++;
-                    buffer_commentaire_str[0] = '\0';
-                    int champs_lus = sscanf(buffer_lecture, "%d;%" SCANF_NOM_WIDTH "[^;];%" SCANF_ESPECE_WIDTH "[^;];%d;%f;%" SCANF_COMM_WIDTH "[^\n]",
-                               &animal_courant.id, animal_courant.nom, buffer_espece_str,
-                               &animal_courant.annee_naissance, &animal_courant.poids, buffer_commentaire_str);
-
-                     if (champs_lus >= 5) {
-                        if (comparer(animal_courant.nom, nomRecherche)) {
-                        
-                            animal_courant.espece = strToEspece(buffer_espece_str);
-                    
-                            snprintf(animal_courant.commentaire, TAILLE_COMM, "%s", buffer_commentaire_str);
-                         
-                            enleverNewline(animal_courant.commentaire, TAILLE_COMM);
-                           
-                            int age = calculerAge(animal_courant.annee_naissance);
-                           
-                            afficherResultat(&animal_courant, age);
-                        
-                            trouve++;
-                        }
-                    } else if (buffer_lecture[0] != '\n' && buffer_lecture[0] != '\0') {
-                         printf(GRAS_JAUNE "⚠️ Ligne %d mal formatée ignorée (Recherche Nom).\n" RESET, ligne_actuelle);
+                    if (lus >= 5 && comparer(animal.nom, nomRecherche)) {
+                        animal.espece = chaineVersEspece(espece_temp);
+                        snprintf(animal.commentaire, TAILLE_COMM, "%s", commentaire_temp);
+                        enleverSautLigne(animal.commentaire, TAILLE_COMM);
+                        int age = calculerAge(animal.annee_naissance);
+                        afficherResultat(&animal, age);
+                        trouve++;
                     }
-                } 
-
-                if (trouve == 0) {
-                    printf(GRAS_JAUNE "❓ Nom '%s' non trouvé.\n" RESET, nomRecherche);
-                } else {
-                    printf(GRAS_VERT "%d correspondance(s) pour '%s'.\n" RESET, trouve, nomRecherche);
                 }
-                action_terminee = 1;
-                break; // Fin case 2
+
+                if (trouve == 0)
+                    printf(JAUNE_GRAS "❓ Aucun animal nommé '%s' trouvé.\n" REINITIALISER, nomRecherche);
+                else
+                    printf(VERT_GRAS "%d correspondance(s) trouvée(s).\n" REINITIALISER, trouve);
+                break;
             }
 
             case 3: {
-                 printf(GRAS_BLEU "\nRecherche par Catégorie d'Âge ⏳\n" RESET);
-                 printf(GRAS_CYAN   "1. Jeune (moins de 2 ans) 🍼\n" RESET);
-                 printf(GRAS_VERT   "2. Adulte (2 à 10 ans) 🧑\n" RESET);
-                 printf(GRAS_MAUVE  "3. Senior (plus de 10 ans) 👴\n" RESET);
-                 printf(GRAS_JAUNE "➡️ Catégorie ('r' retour, 'm' menu) : " RESET);
+                printf(BLEU_GRAS "\nRecherche par Catégorie d'âge ⏳\n" REINITIALISER);
+                printf(CYAN_GRAS  "1. Jeune (< 2 ans)\n" REINITIALISER);
+                printf(VERT_GRAS  "2. Adulte (2–10 ans)\n" REINITIALISER);
+                printf(MAUVE_GRAS "3. Senior (> 10 ans)\n" REINITIALISER);
+                printf(JAUNE_GRAS "➡️ Catégorie : " REINITIALISER);
+                if (!fgets(tampon, sizeof(tampon), stdin)) { fclose(fichier); return; }
+                enleverSautLigne(tampon, sizeof(tampon));
 
-                if (!fgets(buffer_lecture, sizeof(buffer_lecture), stdin)) { fclose(fichier); return; }
-                enleverNewline(buffer_lecture, sizeof(buffer_lecture));
+                if ((tampon[0] == 'm' || tampon[0] == 'M') && tampon[1] == '\0') { fclose(fichier); return; }
+                if ((tampon[0] == 'r' || tampon[0] == 'R') && tampon[1] == '\0') { fclose(fichier); continue; }
 
-                if ((buffer_lecture[0] == 'm' || buffer_lecture[0] == 'M') && buffer_lecture[1] == '\0') { fclose(fichier); return; }
-                if ((buffer_lecture[0] == 'r' || buffer_lecture[0] == 'R') && buffer_lecture[1] == '\0') { fclose(fichier); continue; }
-
-                int categorieChoisie;
-                if (sscanf(buffer_lecture, "%d", &categorieChoisie) != 1 || categorieChoisie < 1 || categorieChoisie > 3) {
-                    printf(GRAS_ROUGE "❌ Catégorie invalide (1, 2 ou 3).\n" RESET);
+                int cat;
+                if (sscanf(tampon, "%d", &cat) != 1 || cat < 1 || cat > 3) {
+                    printf(ROUGE_GRAS "❌ Catégorie invalide.\n" REINITIALISER);
                     fclose(fichier); continue;
                 }
 
-                const char* nomCategorie = "";
-                if(categorieChoisie == 1) nomCategorie = "Jeune (< 2 ans)";
-                else if(categorieChoisie == 2) nomCategorie = "Adulte (2-10 ans)";
-                else nomCategorie = "Senior (> 10 ans)";
+                while (fgets(tampon, sizeof(tampon), fichier)) {
+                    commentaire_temp[0] = '\0';
+                    int lus = sscanf(tampon, "%d;%49[^;];%49[^;];%d;%f;%255[^\n]",
+                                     &animal.id, animal.nom, espece_temp,
+                                     &animal.annee_naissance, &animal.poids, commentaire_temp);
 
-                printf(GRAS_VERT "Recherche catégorie '%s'...\n" RESET, nomCategorie);
-                ligne_actuelle = 0; 
-
-                 while (fgets(buffer_lecture, sizeof(buffer_lecture), fichier)) {
-                    ligne_actuelle++;
-                    buffer_commentaire_str[0] = '\0';
-                    int champs_lus = sscanf(buffer_lecture, "%d;%" SCANF_NOM_WIDTH "[^;];%" SCANF_ESPECE_WIDTH "[^;];%d;%f;%" SCANF_COMM_WIDTH "[^\n]",
-                               &animal_courant.id, animal_courant.nom, buffer_espece_str,
-                               &animal_courant.annee_naissance, &animal_courant.poids, buffer_commentaire_str);
-
-                    if (champs_lus >= 5) {
-                        int age = calculerAge(animal_courant.annee_naissance);
+                    if (lus >= 5) {
+                        int age = calculerAge(animal.annee_naissance);
                         int correspond = 0;
-                        if (age >= 0) {
-                             switch (categorieChoisie) {
-                                case 1: if (age < 2)  correspond = 1; break;
-                                case 2: if (age >= 2 && age <= 10) correspond = 1; break;
-                                case 3: if (age > 10) correspond = 1; break;
-                             }
+                        if ((cat == 1 && age < 2) ||
+                            (cat == 2 && age >= 2 && age <= 10) ||
+                            (cat == 3 && age > 10)) {
+                            correspond = 1;
                         }
+
                         if (correspond) {
-                             animal_courant.espece = strToEspece(buffer_espece_str);
-                             snprintf(animal_courant.commentaire, TAILLE_COMM, "%s", buffer_commentaire_str);
-                             enleverNewline(animal_courant.commentaire, TAILLE_COMM);
-                             afficherResultat(&animal_courant, age);
-                             trouve++;
+                            animal.espece = chaineVersEspece(espece_temp);
+                            snprintf(animal.commentaire, TAILLE_COMM, "%s", commentaire_temp);
+                            enleverSautLigne(animal.commentaire, TAILLE_COMM);
+                            afficherResultat(&animal, age);
+                            trouve++;
                         }
-                    } else if (buffer_lecture[0] != '\n' && buffer_lecture[0] != '\0') {
-                         printf(GRAS_JAUNE "⚠️ Ligne %d mal formatée ignorée (Recherche Age).\n" RESET, ligne_actuelle);
                     }
                 }
 
-                if (trouve == 0) {
-                     printf(GRAS_JAUNE "❓ Aucun animal trouvé catégorie '%s'.\n" RESET, nomCategorie);
-                } else {
-                    printf(GRAS_VERT "%d animal(aux) trouvé(s) catégorie '%s'.\n" RESET, trouve, nomCategorie);
-                }
-                action_terminee = 1;
-                break; // Fin case 3
+                if (trouve == 0)
+                    printf(JAUNE_GRAS "❓ Aucun animal trouvé dans cette catégorie.\n" REINITIALISER);
+                else
+                    printf(VERT_GRAS "%d animal(aux) trouvé(s) dans la catégorie.\n" REINITIALISER, trouve);
+                break;
             }
-
-        } 
-        fclose(fichier);
-        fichier = NULL;
-
-        if (action_terminee) {
-            printf(GRAS_JAUNE "\nAppuyez sur Entrée pour revenir au menu de recherche..." RESET);
-            nettoyerBuffer();
-         
         }
 
-    } 
+        fclose(fichier);
+        printf(JAUNE_GRAS "\nAppuyez sur Entrée pour revenir au menu..." REINITIALISER);
+        nettoyerTampon();
+    }
 }
-
 
