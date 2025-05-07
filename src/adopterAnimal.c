@@ -1,3 +1,4 @@
+
 #include <stdio.h>      
 #include <stdlib.h>     
 #include <time.h> //test      
@@ -7,19 +8,19 @@
 #include "utils.h"      
 #include "comparer.h"   
 
-#define RED_BOLD    "\033[1;31m"  
-#define GREEN_BOLD  "\033[1;32m"  
-#define YELLOW_BOLD "\033[1;33m"  
-#define BLUE_BOLD   "\033[1;34m" 
-#define CYAN_BOLD   "\033[1;36m"  
+#define ROUGE_GRAS    "\033[1;31m"  
+#define VERT_GRAS  "\033[1;32m"  
+#define JAUNE_GRAS "\033[1;33m"  
+#define BLEU_GRAS   "\033[1;34m" 
+#define CYAN_GRAS   "\033[1;36m"  
 
-#define PINK        "\033[1;35m"  
-#define GREEN       "\033[1;32m"  
+#define ROSE       "\033[1;35m"  
+#define VERT      "\033[1;32m"  
 #define CYAN        "\033[1;36m"  
-#define RED         "\033[1;31m"  
-#define WHITE       "\033[1;37m"  
+#define ROUGE         "\033[1;31m"  
+#define BLANC      "\033[1;37m"  
 
-#define RESET       "\033[0m"     
+#define REINITIALISER       "\033[0m"     
 
 
 static int calculerAgeAdopter(int annee_naissance) { 
@@ -44,165 +45,167 @@ static int calculerAgeAdopter(int annee_naissance) {
 }
 
 void adopterAnimal() {
-    FILE *f_in = NULL, *f_out = NULL;
-    char input_buffer[TAILLE_NOM + 10];
+    FILE *f_entree = NULL, *f_sortie = NULL;
+    char tampon_saisie[TAILLE_NOM + 10];
     int id_a_adopter = -1;
     int choix_methode = 0;
     int adoption_terminee = 0;
     char ligne[512];
     Animal correspondances[MAX_ANIMAUX];
     int nb_correspondances = 0;
-    Animal temp_animal;
-    char temp_espece_str[50];
-    char temp_comment_str[TAILLE_COMM];
+    Animal animal_temporaire;
+    char espece_temp_str[50];
+    char commentaire_temp_str[TAILLE_COMM];
 
-    while (!adoption_terminee) {  
+    while (!adoption_terminee) {
         id_a_adopter = -1;
-        nb_correspondances = 0;  
+        nb_correspondances = 0;
 
-        printf(BLUE_BOLD "\n=== Adopter un Animal ===\n" RESET); 
-        printf("Comment identifier l'animal ?\n1. Par ID\n2. Par Nom\n Tapez 'm' pour menu principal.\n");  
-        printf(CYAN_BOLD "Choix : " RESET); 
-        
-        if (!fgets(input_buffer, sizeof(input_buffer), stdin)) {
+        printf(BLEU_GRAS "\n=== Adopter un Animal ===\n" REINITIALISER);
+        printf("Comment identifier l'animal ?\n1. Par ID\n2. Par Nom\n Tapez 'm' pour menu principal.\n");
+        printf(CYAN_GRAS "Choix : " REINITIALISER);
+
+        if (!fgets(tampon_saisie, sizeof(tampon_saisie), stdin)) {
             return;
         }
 
-        enleverNewline(input_buffer, sizeof(input_buffer)); 
-        
-        if (input_buffer[0] == 'm' && input_buffer[1] == '\0') {
+        enleverSautLigne(tampon_saisie, sizeof(tampon_saisie));
+
+        if (tampon_saisie[0] == 'm' && tampon_saisie[1] == '\0') {
             return;
         }
 
-        if (sscanf(input_buffer, "%d", &choix_methode) != 1 || (choix_methode != 1 && choix_methode != 2)) {
-            printf(RED_BOLD "❌ Choix invalide (1 ou 2).\n" RESET);  
-            printf(YELLOW_BOLD "(Rappel: 'm' menu.)\n" RESET);  
-            continue;  
+        if (sscanf(tampon_saisie, "%d", &choix_methode) != 1 || (choix_methode != 1 && choix_methode != 2)) {
+            printf(ROUGE_GRAS "❌ Choix invalide (1 ou 2).\n" REINITIALISER);
+            printf(JAUNE_GRAS "(Rappel : 'm' menu.)\n" REINITIALISER);
+            continue;
         }
 
-        if (choix_methode == 1) { 
-            printf(YELLOW_BOLD "Entrez l'ID ('r' retour, 'm' menu) : " RESET); 
-            if (!fgets(input_buffer, sizeof(input_buffer), stdin)) {  
+        if (choix_methode == 1) {
+            printf(JAUNE_GRAS "Entrez l'ID ('r' retour, 'm' menu) : " REINITIALISER);
+            if (!fgets(tampon_saisie, sizeof(tampon_saisie), stdin)) {
                 return;
             }
-            enleverNewline(input_buffer, sizeof(input_buffer));  
-            if (input_buffer[0] == 'm' && input_buffer[1] == '\0') { 
+            enleverSautLigne(tampon_saisie, sizeof(tampon_saisie));
+
+            if (tampon_saisie[0] == 'm' && tampon_saisie[1] == '\0') {
                 return;
             }
-            if (input_buffer[0] == 'r' && input_buffer[1] == '\0') { 
+            if (tampon_saisie[0] == 'r' && tampon_saisie[1] == '\0') {
                 continue;
             }
 
-            if (sscanf(input_buffer, "%d", &id_a_adopter) != 1 || id_a_adopter <= 0) {
-                printf(RED_BOLD "❌ ID invalide.\n" RESET); 
-                printf(YELLOW_BOLD "(Rappel: 'r' retour, 'm' menu.)\n" RESET);  
-                continue; 
+            if (sscanf(tampon_saisie, "%d", &id_a_adopter) != 1 || id_a_adopter <= 0) {
+                printf(ROUGE_GRAS "❌ ID invalide.\n" REINITIALISER);
+                printf(JAUNE_GRAS "(Rappel : 'r' retour, 'm' menu.)\n" REINITIALISER);
+                continue;
             }
-                
-            printf(GREEN_BOLD "Recherche ID %d...\n" RESET, id_a_adopter);
-        } else { 
-            printf(YELLOW_BOLD "Entrez le Nom ('r' retour, 'm' menu) : " RESET); 
-            if (!fgets(input_buffer, sizeof(input_buffer), stdin)) { 
-                return;  
-            }
-            enleverNewline(input_buffer, sizeof(input_buffer)); 
 
-            if (input_buffer[0] == 'm' && input_buffer[1] == '\0') {
+            printf(VERT_GRAS "Recherche ID %d...\n" REINITIALISER, id_a_adopter);
+        } else {
+            printf(JAUNE_GRAS "Entrez le Nom ('r' retour, 'm' menu) : " REINITIALISER);
+            if (!fgets(tampon_saisie, sizeof(tampon_saisie), stdin)) {
                 return;
             }
-            if (input_buffer[0] == 'r' && input_buffer[1] == '\0') {
+            enleverSautLigne(tampon_saisie, sizeof(tampon_saisie));
+
+            if (tampon_saisie[0] == 'm' && tampon_saisie[1] == '\0') {
+                return;
+            }
+            if (tampon_saisie[0] == 'r' && tampon_saisie[1] == '\0') {
                 continue;
             }
-            
-            if (input_buffer[0] == '\0') {
-                printf(RED_BOLD "❌ Nom vide.\n" RESET);
-                printf(YELLOW_BOLD "(Rappel: 'r' retour, 'm' menu.)\n" RESET);
+
+            if (tampon_saisie[0] == '\0') {
+                printf(ROUGE_GRAS "❌ Nom vide.\n" REINITIALISER);
+                printf(JAUNE_GRAS "(Rappel : 'r' retour, 'm' menu.)\n" REINITIALISER);
                 continue;
             }
-            
+
             char nomRecherche[TAILLE_NOM];
-            snprintf(nomRecherche, sizeof(nomRecherche), "%.*s", (int)(sizeof(nomRecherche)-1), input_buffer);
+            snprintf(nomRecherche, sizeof(nomRecherche), "%.*s", (int)(sizeof(nomRecherche)-1), tampon_saisie);
 
-            f_in = fopen("data/animaux/animaux.txt", "r");
-            if (!f_in) {
-                printf(RED_BOLD "❌ Erreur ouverture fichier.\n" RESET);
+            f_entree = fopen("data/animaux/animaux.txt", "r");
+            if (!f_entree) {
+                printf(ROUGE_GRAS "❌ Erreur ouverture fichier.\n" REINITIALISER);
                 return;
             }
-            
-            while (fgets(ligne, sizeof(ligne), f_in) && nb_correspondances < MAX_ANIMAUX) {
-                if (sscanf(ligne, "%d;%49[^;];", &temp_animal.id, temp_animal.nom) == 2) {
-                    if (comparer(temp_animal.nom, nomRecherche)) {
-                        temp_comment_str[0] = '\0';
-                        int champsLus = sscanf(ligne, "%d;%49[^;];%49[^;];%d;%f;%255[^\n]",
-                                              &correspondances[nb_correspondances].id,
-                                              correspondances[nb_correspondances].nom,
-                                              temp_espece_str,
-                                              &correspondances[nb_correspondances].annee_naissance,
-                                              &correspondances[nb_correspondances].poids,
-                                              temp_comment_str);
-                                              
-                        if (champsLus >= 5) {
-                            correspondances[nb_correspondances].espece = strToEspece(temp_espece_str);
-                            temp_comment_str[sizeof(temp_comment_str)-1] = '\0';
-                            snprintf(correspondances[nb_correspondances].commentaire, TAILLE_COMM, "%s", temp_comment_str);
-                            enleverNewline(correspondances[nb_correspondances].commentaire, TAILLE_COMM);
+
+            while (fgets(ligne, sizeof(ligne), f_entree) && nb_correspondances < MAX_ANIMAUX) {
+                if (sscanf(ligne, "%d;%49[^;];", &animal_temporaire.id, animal_temporaire.nom) == 2) {
+                    if (comparer(animal_temporaire.nom, nomRecherche)) {
+                        commentaire_temp_str[0] = '\0';
+                        int lus = sscanf(ligne, "%d;%49[^;];%49[^;];%d;%f;%255[^\n]",
+                                         &correspondances[nb_correspondances].id,
+                                         correspondances[nb_correspondances].nom,
+                                         espece_temp_str,
+                                         &correspondances[nb_correspondances].annee_naissance,
+                                         &correspondances[nb_correspondances].poids,
+                                         commentaire_temp_str);
+
+                        if (lus >= 5) {
+                            correspondances[nb_correspondances].espece = chaineVersEspece(espece_temp_str);
+                            commentaire_temp_str[sizeof(commentaire_temp_str)-1] = '\0';
+                            snprintf(correspondances[nb_correspondances].commentaire, TAILLE_COMM, "%s", commentaire_temp_str);
+                            enleverSautLigne(correspondances[nb_correspondances].commentaire, TAILLE_COMM);
                             nb_correspondances++;
                         }
                     }
                 }
             }
-            fclose(f_in);
-            f_in = NULL;
+            fclose(f_entree);
+            f_entree = NULL;
 
             if (nb_correspondances == 0) {
-                printf(YELLOW_BOLD "⚠️ Aucun trouvé: '%s'.\n" RESET, nomRecherche);
-                printf(YELLOW_BOLD "(Rappel: 'r' retour, 'm' menu.)\n" RESET);
+                printf(JAUNE_GRAS "⚠️ Aucun trouvé : '%s'.\n" REINITIALISER, nomRecherche);
+                printf(JAUNE_GRAS "(Rappel : 'r' retour, 'm' menu.)\n" REINITIALISER);
                 continue;
             } else if (nb_correspondances == 1) {
                 id_a_adopter = correspondances[0].id;
-                printf(GREEN_BOLD "✅ Un seul trouvé: '%s' (ID: %d).\n" RESET, correspondances[0].nom, id_a_adopter);
+                printf(VERT_GRAS "✅ Un seul trouvé : '%s' (ID : %d).\n" REINITIALISER, correspondances[0].nom, id_a_adopter);
             } else {
-                printf(YELLOW_BOLD "⚠️ Plusieurs trouvés ('%s'):\n" RESET, nomRecherche);
+                printf(JAUNE_GRAS "⚠️ Plusieurs trouvés ('%s'):\n" REINITIALISER, nomRecherche);
                 for (int i = 0; i < nb_correspondances; i++) {
-                    Animal *match = &correspondances[i];
-                    int age = calculerAgeAdopter(match->annee_naissance);
-                    
-                    printf(GREEN_BOLD "---\n" RESET);
-                    printf(YELLOW_BOLD " ID : %d\n" RESET, match->id);
-                    printf(PINK " Nom : %s\n" RESET, match->nom);
-                    printf(GREEN " Espèce : %s\n" RESET, especeToStr(match->espece));
-                    
+                    Animal *a = &correspondances[i];
+                    int age = calculerAgeAdopter(a->annee_naissance);
+
+                    printf(VERT_GRAS "---\n" REINITIALISER);
+                    printf(JAUNE_GRAS " ID : %d\n" REINITIALISER, a->id);
+                    printf(ROSE " Nom : %s\n" REINITIALISER, a->nom);
+                    printf(VERT " Espèce : %s\n" REINITIALISER, especeVersChaine(a->espece));
+
                     if (age == -1) {
-                        printf(CYAN " Âge : Err\n" RESET);
+                        printf(CYAN " Âge : Err\n" REINITIALISER);
                     } else if (age == -2) {
-                        printf(CYAN " Âge : Inv\n" RESET);
+                        printf(CYAN " Âge : Inv\n" REINITIALISER);
                     } else {
-                        printf(CYAN " Âge : %d ans\n" RESET, age);
+                        printf(CYAN " Âge : %d ans\n" REINITIALISER, age);
                     }
-                    
-                    printf(RED " Poids : %.2f kg\n" RESET, match->poids);
-                    printf(WHITE " Commentaire: %s\n" RESET, match->commentaire[0] == '\0' ? "Aucun" : match->commentaire);
+
+                    printf(ROUGE " Poids : %.2f kg\n" REINITIALISER, a->poids);
+                    printf(BLANC " Commentaire : %s\n" REINITIALISER, a->commentaire[0] == '\0' ? "Aucun" : a->commentaire);
                 }
-                printf(GREEN_BOLD "------------------------------------\n" RESET);
+
+                printf(VERT_GRAS "------------------------------------\n" REINITIALISER);
 
                 while (id_a_adopter == -1) {
-                    printf(CYAN_BOLD "\nLequel adopter ?\n" RESET);
-                    printf(YELLOW_BOLD "Entrez ID exact ('r' retour, 'm' menu) : " RESET);
-                    
-                    if (!fgets(input_buffer, sizeof(input_buffer), stdin)) {
+                    printf(CYAN_GRAS "\nLequel adopter ?\n" REINITIALISER);
+                    printf(JAUNE_GRAS "Entrez ID exact ('r' retour, 'm' menu) : " REINITIALISER);
+
+                    if (!fgets(tampon_saisie, sizeof(tampon_saisie), stdin)) {
                         return;
                     }
-                    enleverNewline(input_buffer, sizeof(input_buffer));
-                    
-                    if (input_buffer[0] == 'm' && input_buffer[1] == '\0') {
+                    enleverSautLigne(tampon_saisie, sizeof(tampon_saisie));
+
+                    if (tampon_saisie[0] == 'm' && tampon_saisie[1] == '\0') {
                         return;
                     }
-                    if (input_buffer[0] == 'r' && input_buffer[1] == '\0') {
+                    if (tampon_saisie[0] == 'r' && tampon_saisie[1] == '\0') {
                         break;
                     }
-                    
+
                     int id_temp;
-                    if (sscanf(input_buffer, "%d", &id_temp) == 1) {
+                    if (sscanf(tampon_saisie, "%d", &id_temp) == 1) {
                         int id_valide = 0;
                         for (int i = 0; i < nb_correspondances; i++) {
                             if (correspondances[i].id == id_temp) {
@@ -212,11 +215,11 @@ void adopterAnimal() {
                             }
                         }
                         if (!id_valide) {
-                            printf(RED_BOLD "❌ ID pas listé.\n" RESET);
+                            printf(ROUGE_GRAS "❌ ID pas listé.\n" REINITIALISER);
                         }
                     } else {
-                        printf(RED_BOLD "❌ ID invalide.\n" RESET);
-                        printf(YELLOW_BOLD "(Rappel: 'r' retour, 'm' menu.)\n" RESET);
+                        printf(ROUGE_GRAS "❌ ID invalide.\n" REINITIALISER);
+                        printf(JAUNE_GRAS "(Rappel : 'r' retour, 'm' menu.)\n" REINITIALISER);
                     }
                 }
                 if (id_a_adopter == -1) {
@@ -228,60 +231,58 @@ void adopterAnimal() {
         if (id_a_adopter != -1) {
             int trouve_final = 0;
             char nomTrouveFinal[TAILLE_NOM] = "";
-            
-            f_in = fopen("data/animaux/animaux.txt", "r");
-            f_out = fopen("data/animaux/animaux_temp.txt", "w");
-            
-            if (!f_in || !f_out) {
-                printf(RED_BOLD "❌ Erreur fichiers adoption.\n" RESET);
-                if (f_in) fclose(f_in);
-                if (f_out) fclose(f_out);
+
+            f_entree = fopen("data/animaux/animaux.txt", "r");
+            f_sortie = fopen("data/animaux/animaux_temp.txt", "w");
+
+            if (!f_entree || !f_sortie) {
+                printf(ROUGE_GRAS "❌ Erreur fichiers adoption.\n" REINITIALISER);
+                if (f_entree) fclose(f_entree);
+                if (f_sortie) fclose(f_sortie);
                 remove("data/animaux/animaux_temp.txt");
                 return;
             }
-            
-            while (fgets(ligne, sizeof(ligne), f_in)) {
+
+            while (fgets(ligne, sizeof(ligne), f_entree)) {
                 int idCourant;
                 if (sscanf(ligne, "%d;", &idCourant) == 1) {
                     if (idCourant == id_a_adopter) {
                         trouve_final = 1;
                         sscanf(ligne, "%*d;%49[^;];", nomTrouveFinal);
                     } else {
-                        fprintf(f_out, "%s", ligne);
+                        fprintf(f_sortie, "%s", ligne);
                     }
                 } else {
                     size_t len = longueurChaine(ligne);
                     if (len > 0) {
-                        fprintf(f_out, "%s", ligne);
+                        fprintf(f_sortie, "%s", ligne);
                         if (ligne[len] != '\n') {
-                            fprintf(f_out, "\n");
+                            fprintf(f_sortie, "\n");
                         }
                     }
                 }
             }
-            
-            fclose(f_in);
-            f_in = NULL;
-            fclose(f_out);
-            f_out = NULL;
+
+            fclose(f_entree);
+            fclose(f_sortie);
 
             if (trouve_final) {
                 if (remove("data/animaux/animaux.txt") != 0) {
-                    printf(RED_BOLD "❌ Erreur remove.\n" RESET);
+                    printf(ROUGE_GRAS "❌ Erreur suppression.\n" REINITIALISER);
                     remove("data/animaux/animaux_temp.txt");
                 } else if (rename("data/animaux/animaux_temp.txt", "data/animaux/animaux.txt") != 0) {
-                    printf(RED_BOLD "❌ Erreur rename.\n" RESET);
-                    printf(YELLOW_BOLD " Données dans 'data/animaux/animaux_temp.txt'.\n" RESET);
+                    printf(ROUGE_GRAS "❌ Erreur renommage.\n" REINITIALISER);
+                    printf(JAUNE_GRAS "Données sauvegardées dans 'data/animaux/animaux_temp.txt'.\n" REINITIALISER);
                 } else {
-                    printf(GREEN_BOLD "✅ Adoption de %s (ID: %d) réussie !\n" RESET, nomTrouveFinal, id_a_adopter);
+                    printf(VERT_GRAS "✅ Adoption de %s (ID : %d) réussie !\n" REINITIALISER, nomTrouveFinal, id_a_adopter);
                 }
             } else {
-                printf(YELLOW_BOLD "⚠️ Erreur interne: ID %d non retrouvé.\n" RESET, id_a_adopter);
+                printf(JAUNE_GRAS "⚠️ Erreur interne : ID %d non retrouvé.\n" REINITIALISER, id_a_adopter);
                 remove("data/animaux/animaux_temp.txt");
             }
             adoption_terminee = 1;
             printf("\nAppuyez sur Entrée...");
-            nettoyerBuffer();
+            nettoyerTampon();
         }
     }
 }
