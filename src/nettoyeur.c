@@ -1,79 +1,158 @@
 #include <stdio.h>
-#include <errno.h>
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
+#include <unistd.h>
 #include <sys/stat.h>
-#include <sys/types.h>
-#include "nettoyeur.h"
+#include <errno.h>
+
 #include "comparer.h"
 #include "utils.h"
+#include "animal.h"
+#include "retourmenu.h"
 
-// Vérifie si l'espèce est reconnue parmi les espèces valides
-int especeValide(const char* espece) {
-    return comparer(espece, "Chien")
-        || comparer(espece, "Chat")
-        || comparer(espece, "Hamster")
-        || comparer(espece, "Autruche");
+#define REINITIALISER     "\033[0m"
+#define BLEU_CHIEN        "\033[34m"
+#define VIOLET_CHAT       "\033[35m"
+#define ORANGE_HAMSTER    "\033[33m"
+#define ROSE_AUTRUCHE     "\033[95m"
+#define VERT_TOTAL        "\033[32m"
+#define ROUGE_ERREUR      "\033[1;31m"
+#define JAUNE_AVERT       "\033[33m"
+#define VERT_TITRE        "\033[38;5;82m"
+
+#define CHEMIN_FICHIER "data/animaux/animaux.txt"
+
+// Découpe une ligne en champs séparés par des virgules
+static int decouperLigne(char *ligne, char *champs[], int max_champs) {
+    int i = 0;
+    char *p = ligne;
+
+    if (!ligne) return 0;
+
+    while (*p && i < max_champs) {
+        champs[i++] = p;
+
+        while (*p && *p != ';' && *p != '\n' && *p != '\r') p++;
+
+        if (*p == ';' || *p == '\n' || *p == '\r') {
+            *p = '\0';
+            p++;
+        }
+    }
+
+    return i;
 }
 
-// Nettoie le fichier des animaux en supprimant les lignes invalides
-void nettoyerFichierAnimaux() {
-    printf("\nNettoyage du fichier des animaux...\n");
+// Calcule et affiche les besoins quotidiens en nourriture par espèce
+void afficherNourriture() {
+    printf(VERT_TITRE "\n=== Calcul des Besoins Quotidiens ===\n" REINITIALISER);
 
-    // Création des dossiers si nécessaire
-    mkdir("data", 0755);
-    mkdir("data/animaux", 0755);
+    FILE *f = fopen(CHEMIN_FICHIER, "r");
 
-    FILE *f = fopen("data/animaux/animaux.txt", "r");
     if (!f) {
-        printf("Fichier '%s' introuvable.\n", "data/animaux/animaux.txt");
+        printf(ROUGE_ERREUR "\n🔴 ERREUR : Fichier %s introuvable ou illisible.\n" REINITIALISER, CHEMIN_FICHIER);
         return;
     }
 
-    FILE *backup = fopen("data/animaux/animaux_backup.txt", "w");
-    FILE *temp = fopen("data/animaux/animaux_temp.txt", "w");
-    if (!backup || !temp) {
-        printf("Erreur lors de la création des fichiers temporaires/backup.\n");
-        if (f) fclose(f);
-        if (backup) fclose(backup);
-        if (temp) fclose(temp);
-        remove("data/animaux/animaux_backup.txt");
-        remove("data/animaux/animaux_temp.txt");
+    if (demanderRetourMenu()) {
+        fclose(f);
         return;
     }
 
-    char ligne[512];
-    int lignes_gardees = 0;
-    int lignes_ignorees = 0;
+    // Totaux par espèce
+    float qte_chien = 0, qte_chat = 0, qte_hamster = 0, qte_autruche = 0;
+
+    char ligne[256];
+    int ligne_num = 0;
+
+    time_t now = time(NULL);
+    struct tm tm_info = *localtime(&now);
+    int annee_actuelle = tm_info.tm_year + 1900;
+
+    printf("\nAnalyse du fichier %s...\n", CHEMIN_FICHIER);
 
     while (fgets(ligne, sizeof(ligne), f)) {
-        fputs(ligne, backup);  // Sauvegarde la ligne dans l'autre fichier'
-        char id[11], nom[50], espece[30], annee[10], poids[20], commentaire[256];
-        commentaire[0] = '\0';
+        ligne_num++;
+        char *champs[6];
 
-        int nb = sscanf(ligne, "%10[^;];%49[^;];%29[^;];%9[^;];%19[^;];%255[^\n]",
-                        id, nom, espece, annee, poids, commentaire);
+        if (longueurChaine(ligne) == 0) continue;
 
-        if (nb >= 5 && especeValide(espece)) {
-            fputs(ligne, temp);
-            lignes_gardees++;
-        } else if (longueurChaine(ligne) > 0) {
-            printf("[Nettoyeur IGNORÉ] %s", ligne);
-            if (ligne[longueurChaine(ligne)] != '\n') {
-                printf("\n");
-            }
-            lignes_ignorees++;
+        int nb = decouperLigne(ligne, champs, 6);
+
+        if (nb < 5) {
+            printf(JAUNE_AVERT "⚠️ Ligne %d : champs insuffisants (%d/5 requis), ignorée.\n" REINITIALISER, ligne_num, nb);
+            continue;
+        }
+
+        char *type = champs[2];
+        int annee;
+        float poids;
+
+        if (sscanf(champs[3], "%d", &annee) != 1 || annee < 1900 || annee > annee_actuelle + 1) {
+            printf(JAUNE_AVERT "⚠️ Ligne %d : année invalide ('%s'), ignorée.\n" REINITIALISER, ligne_num, champs[3]);
+            continue;
+        }
+
+        if (sscanf(champs[4], "%f", &poids) != 1 || poids <= 0) {
+            printf(JAUNE_AVERT "⚠️ Ligne %d : poids invalide ou nul ('%s'), ignorée.\n" REINITIALISER, ligne_num, champs[4]);
+            continue;
+        }
+
+        int age = annee_actuelle - annee;
+        if (age < 0) age = 0;
+
+        float qte_animal = 0;
+
+        if (comparer(type, "hamster")) {
+            qte_animal = 0.02f;
+            qte_hamster += qte_animal;
+
+        } else if (comparer(type, "autruche")) {
+            qte_animal = 2.5f;
+            qte_autruche += qte_animal;
+
+        } else if (comparer(type, "chien")) {
+            qte_animal = (age < 2) ? 0.5f : (0.1f * poids);
+            qte_chien += qte_animal;
+
+        } else if (comparer(type, "chat")) {
+            qte_animal = (age < 2) ? 0.5f : (0.1f * poids);
+            qte_chat += qte_animal;
         }
     }
 
     fclose(f);
-    fclose(backup);
-    fclose(temp);
+    printf("Analyse terminée.\n");
 
-    // Remplace l'ancien fichier par le nettoyé
-    if (remove("data/animaux/animaux.txt") != 0) {
-        printf("Erreur lors de la suppression de l'ancien fichier.\n");
-    } else if (rename("data/animaux/animaux_temp.txt", "data/animaux/animaux.txt") != 0) {
-        printf("Erreur lors du renommage du fichier nettoyé.\n");
+    printf("\n=== Résultats des Besoins Quotidiens ===\n");
+
+    int nb_especes = 0;
+
+    if (qte_chien > 0) {
+        printf(BLEU_CHIEN "→ Chien    : %6.2f kg 🐕\n" REINITIALISER, qte_chien);
+        nb_especes++;
+    }
+
+    if (qte_chat > 0) {
+        printf(VIOLET_CHAT "→ Chat     : %6.2f kg 🐈\n" REINITIALISER, qte_chat);
+        nb_especes++;
+    }
+
+    if (qte_hamster > 0) {
+        printf(ORANGE_HAMSTER "→ Hamster  : %4.2f kg 🐹\n" REINITIALISER, qte_hamster);
+        nb_especes++;
+    }
+
+    if (qte_autruche > 0) {
+        printf(ROSE_AUTRUCHE "→ Autruche : %4.2f kg 🦩\n" REINITIALISER, qte_autruche);
+        nb_especes++;
+    }
+
+    if (nb_especes == 0) {
+        printf(JAUNE_AVERT "Aucune donnée animale valide trouvée pour calculer la nourriture.\n" REINITIALISER);
     } else {
-        printf("Nettoyage terminé : %d ligne(s) gardée(s), %d ignorée(s). Backup créé.\n", lignes_gardees, lignes_ignorees);
+        float total = qte_chien + qte_chat + qte_hamster + qte_autruche;
+        printf(VERT_TOTAL "\nTotal : %.2f kg 🌍\n" REINITIALISER, total);
     }
 }
