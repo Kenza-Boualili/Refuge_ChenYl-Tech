@@ -2,7 +2,7 @@
 // Ces lignes servent à éviter que le contenu de ce fichier soit inclus
 // plusieurs fois dans un même fichier source 
 // Si 'ADOPTER_ANIMAL_H' n'a pas encore été défini:
-#ifndef ADOPTER_ANIMAL_H //test 2
+#ifndef ADOPTER_ANIMAL_H
 // alors on le définit maintenant:
 #define ADOPTER_ANIMAL_H
 
