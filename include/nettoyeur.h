@@ -1,19 +1,13 @@
-#ifndef NETTOYEUR_H          // Si NETTOYEUR_H n'est pas défini,
-                             // cela permet d'éviter les inclusions multiples
+#ifndef NETTOYEUR_H
+#define NETTOYEUR_H
 
-#define NETTOYEUR_H          // Définit NETTOYEUR_H pour "bloquer" 
-                             // ce fichier lors des prochaines inclusions
+// Compare deux chaînes (retourne 1 si égales, 0 sinon)
+int comparer(const char* s1, const char* s2);
 
-int comparer(const char* s1, const char* s2);  // Déclaration d'une fonction :
-                                               // - Retourne un entier (résultat de comparaison)
-                                               // - Prend 2 chaînes de caractères en entrée (s1 et s2)
+// Vérifie si une espèce donnée est valide (Chien, Chat, Hamster, Autruche)
+int especeValide(const char* espece);
 
-int especeValide(const char* espece);          // Déclaration d'une fonction :
-                                               // - Retourne 1 (vrai) ou 0 (faux)
-                                               // - Vérifie si l'espèce (exemple: "Chat") est valide
+// Nettoie le fichier des animaux en supprimant les lignes invalides
+void nettoyerFichierAnimaux();
 
-void nettoyerFichierAnimaux();                 // Déclaration d'une fonction :
-                                               // - Ne retourne rien (void)
-                                               // - Effectue un nettoyage du fichier d'animaux  pour corriger les erreurs dans le fichier
-
-#endif                     // Fin de la protection contre les inclusions multiples
+#endif // NETTOYEUR_H
