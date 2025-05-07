@@ -1,8 +1,8 @@
 #include "animal.h"
 #include <stdio.h>
 
-
-int stringsEgaux(const char* a, const char* b) {
+// Compare deux chaînes sans tenir compte de la casse
+int chainesEgales(const char* a, const char* b) {
     int i = 0;
     while (a[i] != '\0' && b[i] != '\0') {
         char ca = a[i];
@@ -20,56 +20,56 @@ int stringsEgaux(const char* a, const char* b) {
     return a[i] == '\0' && b[i] == '\0';
 }
 
-Espece strToEspece(const char* str) {
-    if (stringsEgaux(str, "Chien")) return CHIEN;
-    if (stringsEgaux(str, "Chat")) return CHAT;
-    if (stringsEgaux(str, "Hamster")) return HAMSTER;
-    if (stringsEgaux(str, "Autruche")) return AUTRUCHE;
+// Convertit une chaîne vers une espèce (enum)
+Espece chaineVersEspece(const char* str) {
+    if (chainesEgales(str, "Chien")) return CHIEN;
+    if (chainesEgales(str, "Chat")) return CHAT;
+    if (chainesEgales(str, "Hamster")) return HAMSTER;
+    if (chainesEgales(str, "Autruche")) return AUTRUCHE;
     return -1;
 }
 
-
-const char* especeToStr(Espece e) {
+// Convertit une espèce vers une chaîne
+const char* especeVersChaine(Espece e) {
     switch (e) {
-        case CHIEN: return "Chien";
-        case CHAT: return "Chat";
-        case HAMSTER: return "Hamster";
+        case CHIEN:    return "Chien";
+        case CHAT:     return "Chat";
+        case HAMSTER:  return "Hamster";
         case AUTRUCHE: return "Autruche";
-        default: return "Inconnu";
+        default:       return "Inconnu";
     }
 }
 
-
-
+// Affiche le menu de choix d'espèce et retourne le choix de l'utilisateur
 Espece choisirEspece() {
     int c;
-    char input;
+    char saisie;
 
     while (1) {
         printf("Choisissez une espèce :\n");
         printf("1. Chien\n2. Chat\n3. Hamster\n4. Autruche\nVotre choix : ");
 
-        // Lire le premier caractère non-blanc
-        if (scanf(" %c", &input) != 1) {
-            // Si échec (ex: EOF), vider le buffer et recommencer
+        // Lecture sécurisée d’un seul caractère (non blanc)
+        if (scanf(" %c", &saisie) != 1) {
+            // En cas d’échec, on vide le tampon et on recommence
             while ((c = getchar()) != '\n' && c != EOF);
             continue;
         }
 
-        // Vérifier si le caractère est entre '1' et '4'
-        if (input >= '1' && input <= '4') {
-            // Vérifier que le caractère suivant est un '\n'
+        // Vérifie si c’est un chiffre entre 1 et 4
+        if (saisie >= '1' && saisie <= '4') {
+            // Vérifie qu’il n’y a rien après
             if (getchar() == '\n') {
-                return (Espece)(input - '1'); // Conversion en enum
+                return (Espece)(saisie - '1'); // Conversion vers enum
             } else {
                 printf("Erreur : Entrez UN SEUL chiffre.\n");
-                while ((c = getchar()) != '\n' && c != EOF); // Vider le surplus
+                while ((c = getchar()) != '\n' && c != EOF);
             }
         } else {
-            printf("Erreur : Chiffre entre 1 et 4 requis.\n");
+            printf("Erreur : chiffre entre 1 et 4 requis.\n");
         }
 
-        // Vider le buffer en cas d'erreur
+        // Nettoyage du reste du tampon
         while ((c = getchar()) != '\n' && c != EOF);
     }
-}
+}   
