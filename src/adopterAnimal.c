@@ -61,8 +61,7 @@ void adopterAnimal() {
     Animal animal_temporaire; 
 
     char espece_temp_str[50];
-    char commentaire_temp_str[TAILLE_COMM];
-
+   char commentaire_temp_str[TAILLE_COMM];
     while (!adoption_terminee) {
         id_a_adopter = -1;
         nb_correspondances = 0;
