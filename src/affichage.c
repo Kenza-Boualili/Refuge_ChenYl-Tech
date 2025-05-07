@@ -9,7 +9,9 @@
 
 // Affiche les informations complètes d'un animal donné
 void afficherResultat(const Animal *a, int age_calcule) {
-    if (!a) return;
+    if (!a){
+        return;
+    } 
 
     printf("\n--- Résultat ---\n");
     printf("ID          : %d\n", a->id);
@@ -49,4 +51,6 @@ void afficherMenu() {
 
     printf(CYAN "\n👉 Choix : " REINITIALISER);
 }
+
+
 
