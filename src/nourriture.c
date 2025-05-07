@@ -25,16 +25,20 @@
 #define FILE_PATH "data/animaux/animaux.txt"
 
 
-static int split_line(char *line, char *champs[], int max_champs) {
+static int diviser_ligne(char *ligne, char *elements[], int max_elements) {
     int i = 0;
-    char *p = line;
+    char *p = ligne;
 
-    if (!line) return 0;
+    if (!ligne) {
+        return 0;
+    }
 
-    while (*p && i < max_champs) {
-        champs[i++] = p;
+    while (*p && i < max_elements) {
+        elements[i++] = p;
 
-        while (*p && *p != ';' && *p != '\n' && *p != '\r') p++;
+        while (*p && *p != ';' && *p != '\n' && *p != '\r') {
+            p++;
+        }
 
         if (*p == ';' || *p == '\n' || *p == '\r') {
             *p = '\0';
@@ -45,14 +49,13 @@ static int split_line(char *line, char *champs[], int max_champs) {
     return i;
 }
 
-
 void afficherNourriture() {
     printf(VERT_TITRE "\n=== Calcul Besoins Quotidiens ===\n" RESET);
 
     FILE *f = fopen(FILE_PATH, "r");
 
     if (!f) {
-        printf(RED_ERROR "\n🔴 ERREUR : Fichier %s introuvable ou illisible.\n" RESET, FILE_PATH);
+        printf(RED_ERROR "\n🔴 ERREUR : Fichier %s introuvable.\n" RESET, FILE_PATH);
         return;
     }
 
@@ -67,44 +70,55 @@ void afficherNourriture() {
     char ligne[256];
     int ligne_num = 0;
 
-    time_t now = time(NULL);
-    struct tm tm_info = *localtime(&now);
-    int annee_actuelle = tm_info.tm_year + 1900;
+    // Obtenir l'heure actuelle
+    time_t t = time(NULL);
+    struct tm *tm_info = localtime(&t);
+
+    if (!tm_info) {
+        printf(RED_ERROR "ERREUR: Impossible d'obtenir l'heure actuelle.\n" RESET);
+        fclose(f);
+        return;
+    }
+
+    int annee_actuelle = 1900 + tm_info->tm_year;
 
     printf("\nAnalyse du fichier %s...\n", FILE_PATH);
 
     while (fgets(ligne, sizeof(ligne), f)) {
         ligne_num++;
-        char *champs[6];
+        char *elements[6];
 
-        if (longueurChaine(ligne) == 0) continue;
+        if (longueurChaine(ligne) == 0){
+            continue;
+        } 
 
-        int nb = split_line(ligne, champs, 6);
+        int nb = diviser_ligne(ligne, elements, 6);
 
         if (nb < 5) {
-            printf(YELLOW_WARN "⚠️ L%d: Champs insuffisants (%d/5 requis), ligne ignorée.\n" RESET, ligne_num, nb);
+            printf(YELLOW_WARN "⚠️ L%d: Champs insuffisants (%d/5 necessaire), ligne ignorée.\n" RESET, ligne_num, nb);
             continue;
         }
 
         
-        char *type = champs[2];
+        char *type = elements[2];
         int annee;
         float poids;
 
-        if (sscanf(champs[3], "%d", &annee) != 1 || annee < 1900 || annee > annee_actuelle + 1) {
-            printf(YELLOW_WARN "⚠️ L%d: Année invalide ('%s'), ligne ignorée.\n" RESET, ligne_num, champs[3]);
+        if (sscanf(elements[3], "%d", &annee) != 1 || annee < 1900 || annee > annee_actuelle + 1) {
+            printf(YELLOW_WARN "⚠️ L%d: Année invalide ('%s'), ligne ignorée.\n" RESET, ligne_num, elements[3]);
             continue;
         }
 
-        if (sscanf(champs[4], "%f", &poids) != 1 || poids <= 0) {
-            printf(YELLOW_WARN "⚠️ L%d: Poids invalide ou nul ('%s'), ligne ignorée.\n" RESET, ligne_num, champs[4]);
+        if (sscanf(elements[4], "%f", &poids) != 1 || poids <= 0) {
+            printf(YELLOW_WARN "⚠️ L%d: Poids invalide ou nul ('%s'), ligne ignorée.\n" RESET, ligne_num, elements[4]);
             continue;
         }
 
         int age = annee_actuelle - annee;
-        if (age < 0) age = 0;
+        if (age < 0){
+            age = 0;
+        } 
 
-        
         float qte_animal = 0;
 
         if (comparer(type, "hamster")) {
@@ -115,22 +129,22 @@ void afficherNourriture() {
             qte_animal = 2.5f;
             qte_autruche += qte_animal;
 
-        } else if (comparer(type, "chien")) {
-            qte_animal = (age < 2) ? 0.5f : (0.1f * poids);
+        } else if (age < 2) {
+            qte_animal = 0.5f;
+        } else {
+            qte_animal = 0.1f * poids;
+        }
+        
+        if (comparer(type, "chien")) {
             qte_chien += qte_animal;
-
         } else if (comparer(type, "chat")) {
-            qte_animal = (age < 2) ? 0.5f : (0.1f * poids);
             qte_chat += qte_animal;
         }
-
-        
     }
 
     fclose(f);
     printf("Analyse terminée.\n");
 
-  
     printf("\n=== Résultats Besoins Quotidiens ===\n");
 
     int animaux_comptes = 0;
@@ -162,13 +176,3 @@ void afficherNourriture() {
         printf(VERT_TOTAL "\nTotal : %.2f kg 🌍\n" RESET, total);
     }
 }
-
-
-
-
-
- 
-
-
-
-
