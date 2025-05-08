@@ -27,6 +27,7 @@ void nettoyerFichierAnimaux() {
         printf(ROUGE_ERREUR "Erreur : Impossible d’ouvrir le fichier %s\n" REINITIALISER, CHEMIN_FICHIER);
         return;
     }
-close(f);
+fclose(f);
     printf(VERT_TITRE "Le fichier %s a été vidé avec succès.\n" REINITIALISER, CHEMIN_FICHIER);
 }
+
