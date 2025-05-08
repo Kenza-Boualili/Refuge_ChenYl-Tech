@@ -23,7 +23,7 @@ void nettoyerFichierAnimaux() {
     printf(VERT_TITRE "\n=== Nettoyage du fichier animaux ===\n" REINITIALISER);
 
     FILE *f = fopen(CHEMIN_FICHIER, "w"); 
-    if (!f) {
+    if (f==NULL) {
         printf(ROUGE_ERREUR "Erreur : Impossible d’ouvrir le fichier %s\n" REINITIALISER, CHEMIN_FICHIER);
         return;
     }
