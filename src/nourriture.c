@@ -29,7 +29,7 @@ static int diviser_ligne(char *ligne, char *elements[], int max_elements) {
     int i = 0;
     char *p = ligne;
 
-    if (!ligne) {
+    if (ligne==NULL) {
         return 0;
     }
 
@@ -54,7 +54,7 @@ void afficherNourriture() {
 
     FILE *f = fopen(FILE_PATH, "r");
 
-    if (!f) {
+    if (f==NULL) {
         printf(RED_ERROR "\n🔴 ERREUR : Fichier %s introuvable.\n" RESET, FILE_PATH);
         return;
     }
@@ -74,7 +74,7 @@ void afficherNourriture() {
     time_t t = time(NULL);
     struct tm *tm_info = localtime(&t);
 
-    if (!tm_info) {
+    if (tm_info==NULL) {
         printf(RED_ERROR "ERREUR: Impossible d'obtenir l'heure actuelle.\n" RESET);
         fclose(f);
         return;
