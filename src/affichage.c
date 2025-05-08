@@ -9,20 +9,21 @@
 
 // Affiche les informations complètes d'un animal donné
 void afficherResultat(const Animal *a, int age_calcule) {
-    if (a==NULL){
+    if (a == NULL) {
         return;
-    } 
+    }
+
+    Animal animal = *a;  
 
     printf("\n--- Résultat ---\n");
-    printf("ID          : %d\n", a->id);
-    printf("Nom         : %s\n", a->nom);
-    printf("Espèce      : %s\n", especeVersChaine(a->espece));
-    printf("Année Naiss : %d\n", a->annee_naissance);
-    printf("Poids       : %.2f kg\n", a->poids);
+    printf("ID          : %d\n", animal.id);
+    printf("Nom         : %s\n", animal.nom);
+    printf("Espèce      : %s\n", especeVersChaine(animal.espece));
+    printf("Année Naiss : %d\n", animal.annee_naissance);
+    printf("Poids       : %.2f kg\n", animal.poids);
     printf("Âge calculé : %d ans\n", age_calcule);
-    printf("Commentaire : %s\n", a->commentaire);
+    printf("Commentaire : %s\n", animal.commentaire);
 }
-
 // Affiche le sous-menu pour choisir le type d’âge à afficher
 int menuTypeAge(void) {
     int choix = 0;
