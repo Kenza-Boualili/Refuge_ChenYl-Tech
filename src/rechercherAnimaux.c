@@ -85,7 +85,7 @@ static int calculerAge(int annee_naissance) {
     }
     time_t maintenant = time(NULL);
     struct tm *tm_info = localtime(&maintenant);
-    if (!tm_info){
+    if (tm_info==NULL){
         return -1;
     }
     int annee_actuelle = tm_info->tm_year + 1900;
@@ -111,7 +111,7 @@ void rechercherAnimaux() {
         printf(JAUNE_GRAS "➡️ Tapez 'm' pour retourner au menu principal.\n" REINITIALISER);
         printf(BLEU_GRAS "Votre choix : " REINITIALISER);
 
-        if (!fgets(tampon, sizeof(tampon), stdin)){
+        if (fgets(tampon, sizeof(tampon), stdin)==NULL){
             return;
         }
         enleverSautLigne(tampon, sizeof(tampon));
@@ -126,7 +126,7 @@ void rechercherAnimaux() {
         }
 
         fichier = fopen(CHEMIN_FICHIER_ANIMAUX, "r");
-        if (!fichier) {
+        if (fichier==NULL) {
             printf(ROUGE_GRAS "\n❌ Erreur : impossible d’ouvrir le fichier.\n" REINITIALISER);
             continue;
         }
@@ -137,7 +137,7 @@ void rechercherAnimaux() {
             case 1: {
                 printf(BLEU_GRAS "\nRecherche par ID 🆔\n" REINITIALISER);
                 printf(JAUNE_GRAS "➡️ Entrez l’ID ('r' retour, 'm' menu) : " REINITIALISER);
-                if (!fgets(tampon, sizeof(tampon), stdin)) { 
+                if (fgets(tampon, sizeof(tampon), stdin)==NULL) { 
                     fclose(fichier);
                     return; 
                 }
@@ -174,7 +174,7 @@ void rechercherAnimaux() {
                     }
                 }
 
-                if (!trouve) {
+                if (trouve==NULL) {
                     printf(JAUNE_GRAS "❓ ID %d non trouvé.\n" REINITIALISER, idRecherche);
                 }
                 break;
@@ -183,7 +183,7 @@ void rechercherAnimaux() {
             case 2: {
                 printf(BLEU_GRAS "\nRecherche par Nom 📛\n" REINITIALISER);
                 printf(JAUNE_GRAS "➡️ Nom recherché ('r' retour, 'm' menu) : " REINITIALISER);
-                if (!fgets(tampon, sizeof(tampon), stdin)) {
+                if (fgets(tampon, sizeof(tampon), stdin)==NULL) {
                     fclose(fichier);
                     return;
                 }
@@ -235,7 +235,7 @@ void rechercherAnimaux() {
                 printf(VERT_GRAS  "2. Adulte (2–10 ans)\n" REINITIALISER);
                 printf(MAUVE_GRAS "3. Senior (> 10 ans)\n" REINITIALISER);
                 printf(JAUNE_GRAS "➡️ Catégorie : " REINITIALISER);
-                if (!fgets(tampon, sizeof(tampon), stdin)) { 
+                if (fgets(tampon, sizeof(tampon), stdin)==NULL) { 
                     fclose(fichier);
                     return;
                 }
