@@ -4,15 +4,15 @@
 void nettoyerTampon() {
     while (getchar() != '\n'); 
 }    
-void enleverSautLigne(char *chaine, size_t taille_maximale) {
-    for (size_t i = 0; i < taille_maximale && chaine[i] != '\0'; i++) {
+void enleverSautLigne(char *chaine, int taille_max) {
+    for (int i = 0; i < taille_max && chaine[i] != '\0'; i++) {
         if (chaine[i] == '\n' || chaine[i] == '\r') {
             chaine[i] = '\0';
             return;
         }
     }
-    if (taille_maximale > 0) {
-        chaine[taille_maximale - 1] = '\0';
+    if (taille_max > 0) {
+        chaine[taille_max - 1] = '\0';
     }
 }
 
