@@ -73,4 +73,3 @@ Espece choisirEspece() {
         while ((c = getchar()) != '\n' && c != EOF);
     }
 }   
- 
