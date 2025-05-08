@@ -49,7 +49,7 @@ Espece choisirEspece() {
         printf("Choisissez une espèce :\n");
         printf("1. Chien\n2. Chat\n3. Hamster\n4. Autruche\nVotre choix : ");
 
-        // Lecture sécurisée d’un seul caractère (non blanc)
+        // Lecture sécurisée d’un seul caractère 
         if (scanf(" %c", &saisie) != 1) {
             // En cas d’échec, on vide le tampon et on recommence
             while ((c = getchar()) != '\n' && c != EOF);
@@ -73,3 +73,4 @@ Espece choisirEspece() {
         while ((c = getchar()) != '\n' && c != EOF);
     }
 }   
+ 
