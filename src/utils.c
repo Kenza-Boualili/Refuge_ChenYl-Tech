@@ -1,6 +1,6 @@
 #include "utils.h"
 #include <stdio.h>
-
+#include <stdlib.h>
 void nettoyerTampon() {
     while (getchar() != '\n'); 
 }    
@@ -27,31 +27,61 @@ size_t longueurChaine(const char *chaine) {
     return longueur;
 }
 
+void copierTexte(char *destination, const char *source, int max_size) {
+    size_t i = 0;
+    while (source[i] != '\0' && i < max_size - 1) {
+        destination[i] = source[i];
+        i++;
+    }
+    destination[i] = '\0';  
+}
+
+void nettoyerLigne(char *ligne) {
+    size_t i = 0;
+    
+    while (ligne[i]) {
+        if (ligne[i] == '\n' || ligne[i] == '\r') {
+            ligne[i] = '\0';  
+            break;
+        }
+        i++;
+    }
+}
+
 int extraireChamps(char *ligne, Animal *animal, char *especeTemp, char *commentaireTemp) {
     int champ = 0, index = 0, i = 0;
     char morceau[256];
 
+    if (ligne == NULL || ligne[0] == '\0') {
+        return 0;  // Ligne vide, on retourne
+    }
+
     while (ligne[i]) {
         if (ligne[i] == ';' || ligne[i] == '\n' || ligne[i] == '\0') {
-            morceau[index] = '\0';
+            morceau[index] = '\0'; 
+
+            if (champ == 0 && morceau[0] == '\0') {
+                printf("⚠️ Champ id manquant\n");
+                return 0;  // Champ 'id' manquant, erreur
+            }
 
             switch (champ) {
-                case 0:
+                case 0:  // id
                     animal->id = atoi(morceau);
                     break;
-                case 1:
+                case 1:  // nom
                     copierTexte(animal->nom, morceau, TAILLE_NOM);
                     break;
-                case 2:
+                case 2:  // espèce
                     copierTexte(especeTemp, morceau, 50);
                     break;
-                case 3:
+                case 3:  // année de naissance
                     animal->annee_naissance = atoi(morceau);
                     break;
-                case 4:
+                case 4:  // poids
                     animal->poids = atof(morceau);
                     break;
-                case 5:
+                case 5:  // commentaire
                     copierTexte(commentaireTemp, morceau, TAILLE_COMM);
                     break;
                 default:
@@ -72,6 +102,5 @@ int extraireChamps(char *ligne, Animal *animal, char *especeTemp, char *commenta
         i++;
     }
 
-    return champ >= 5;
+    return champ >= 5;  
 }
-
