@@ -6,7 +6,6 @@
 void nettoyerTampon();
 void enleverSautLigne(char *chaine, size_t taille_max);
 size_t longueurChaine(const char *chaine);
-int compareStr(const char *a, const char *b);
 int extraireChamps(char *ligne, Animal *animal, char *especeTemp, char *commentaireTemp);
 
 
