@@ -1,3 +1,4 @@
+#include"../include/animal.h"
 #include "../include/comparer.h"
 
 
