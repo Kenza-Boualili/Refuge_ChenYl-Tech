@@ -206,5 +206,4 @@ void afficherInventaire() {
     printf(VERT "-----------------------------\n" REINITIALISER);
 }
 
-
    
