@@ -11,7 +11,7 @@ int demanderRetourMenu() {
 
     printf("\n" JAUNE "Appuyez sur 'm' + Entrée pour retourner au menu ou juste Entrée pour continuer... " REINITIALISER);
 
-    if (!fgets(tampon, sizeof(tampon), stdin)) {
+    if (fgets(tampon, sizeof(tampon), stdin)==NULL) {
         return 0;
     }
 
