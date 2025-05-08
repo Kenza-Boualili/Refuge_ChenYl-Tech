@@ -16,20 +16,25 @@
 #define JAUNE_WARN  "\033[33m"
 #define REINITIALISER "\033[0m"
 
-struct ResumeEspece {
+typedef struct {
     const char *nom;
     int nb;
-};
+} ResumeEspece;
 
 static int calculerAgeInventaire(int annee_naissance) {
-    if (annee_naissance <= 0) return -2;
-
+    if (annee_naissance <= 0){
+        return -2;
+    }
     time_t maintenant = time(NULL);
     struct tm *tm = localtime(&maintenant);
-    if (tm == NULL) return -1;
+    if (tm == NULL){
+        return -1;
+    }
 
     int annee_actuelle = tm->tm_year + 1900;
-    if (annee_naissance > annee_actuelle || annee_naissance < 1900) return -2;
+    if (annee_naissance > annee_actuelle || annee_naissance < 1900){
+        return -2;
+    }
 
     return annee_actuelle - annee_naissance;
 }
@@ -38,10 +43,18 @@ static int comparerAnimauxParEspece(const void *p1, const void *p2) {
     const Animal *a1 = (const Animal *)p1;
     const Animal *a2 = (const Animal *)p2;
 
-    if (a1->espece < a2->espece) return -1;
-    if (a1->espece > a2->espece) return 1;
-    if (a1->id < a2->id) return -1;
-    if (a1->id > a2->id) return 1;
+    if (a1->espece < a2->espece){
+        return -1;
+    }
+    if (a1->espece > a2->espece){
+        return 1;
+    }
+    if (a1->id < a2->id){
+        return -1;
+    }
+    if (a1->id > a2->id){
+        return 1;
+    }
 
     return 0;
 }
@@ -56,7 +69,7 @@ void afficherInventaire() {
     printf("\n" VERT "=== Inventaire Détaillé par Espèce ===\n" REINITIALISER);
 
     FILE *f = fopen("data/animaux/animaux.txt", "r");
-    if (!f) {
+    if (f==NULL) {
         printf(ROUGE "❌ Erreur fichier '%s'.\n" REINITIALISER, "data/animaux/animaux.txt");
         return;
     }
@@ -97,7 +110,7 @@ void afficherInventaire() {
         }
     }
 
-    if (!feof(f) && nb_animaux == MAX_ANIMAUX) {
+    if ((feof(f) && nb_animaux == MAX_ANIMAUX)==NULL) {
         printf(JAUNE_WARN "\nAttention : limite atteinte (%d animaux).\n" REINITIALISER, MAX_ANIMAUX);
         while (fgets(ligne, sizeof(ligne), f)); // On lit le reste pour vider
     }
@@ -122,7 +135,7 @@ void afficherInventaire() {
         Animal *a = &refuge[i];
 
         if (premier || a->espece != espece_precedente) {
-            if (!premier) printf("\n");
+            if (premier==NULL) printf("\n");
             printf(BLEU "--- %ss ---\n" REINITIALISER, especeVersChaine(a->espece));
             espece_precedente = a->espece;
             premier = 0;
@@ -153,12 +166,13 @@ void afficherInventaire() {
     printf(VERT "-------------------------------------\n" REINITIALISER);
     printf(ROSE "\n--- Résumé ---\n" REINITIALISER);
 
-    struct ResumeEspece resume[] = {
-        {"Chien", nb_chien},
-        {"Chat", nb_chat},
-        {"Hamster", nb_hamster},
-        {"Autruche", nb_autruche}
-    };
+    ResumeEspece resume[] = {
+    {"Chien", nb_chien},
+    {"Chat", nb_chat},
+    {"Hamster", nb_hamster},
+    {"Autruche", nb_autruche}
+};
+
 
     int nb_especes = sizeof(resume) / sizeof(resume[0]);
     qsort(resume, nb_especes, sizeof(struct ResumeEspece), comparerResumeEspece);
