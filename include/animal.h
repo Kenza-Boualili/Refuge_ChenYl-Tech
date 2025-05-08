@@ -1,32 +1,8 @@
-#ifndef ANIMAL_H
-#define ANIMAL_H
+// Si le symbole 'COMPARER_H' n'a pas encore été défini:
+#ifndef COMPARER_H
+//on le définit maintenant.
+#define COMPARER_H
 
-#define MAX_ANIMAUX 50
-#define TAILLE_NOM 50
-#define TAILLE_COMM 256
-
-typedef enum {
-    CHIEN,
-    CHAT,
-    HAMSTER,
-    AUTRUCHE
-} Espece;
-
-typedef struct {
-    int id;
-    char nom[TAILLE_NOM];
-    Espece espece;
-    int annee_naissance;
-    float poids;
-    char commentaire[TAILLE_COMM];
-} Animal;
-
-Espece choisirEspece();
-
-Espece chaineVersEspece(const char* str);
-
-const char* especeVersChaine(Espece e);
-
-void adopterAnimal();
-
-#endif
+int comparer(const char *s1, const char *s2);
+int comparerAnimauxParEspece(const void *a, const void *b);
+#endif 
