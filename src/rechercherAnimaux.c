@@ -21,15 +21,6 @@
 
 #define CHEMIN_FICHIER_ANIMAUX "data/animaux/animaux.txt"
 
-void copierTexte(char *destination, const char *source, int taille_max) {
-    int i = 0;
-    while (source[i] && i < taille_max - 1) {
-        destination[i] = source[i];
-        i++;
-    }
-    destination[i] = '\0';
-}
-
 // Calcule l’âge à partir de l’année de naissance
 static int calculerAge(int annee_naissance) {
     if (annee_naissance <= 0){
@@ -66,7 +57,7 @@ void rechercherAnimaux() {
         if (fgets(tampon, sizeof(tampon), stdin)==NULL){
             return;
         }
-        enleverSautLigne(tampon, sizeof(tampon));
+        enleverSautLigne(tampon, sizeof(tampon));  // Appel à la fonction définie dans utils.h
 
         if ((tampon[0] == 'm' || tampon[0] == 'M') && tampon[1] == '\0'){
             return;
@@ -93,7 +84,7 @@ void rechercherAnimaux() {
                     fclose(fichier);
                     return; 
                 }
-                enleverSautLigne(tampon, sizeof(tampon));
+                enleverSautLigne(tampon, sizeof(tampon));  // Appel à la fonction définie dans utils.h
 
                 if ((tampon[0] == 'm' || tampon[0] == 'M') && tampon[1] == '\0') { 
                     fclose(fichier);
@@ -104,20 +95,20 @@ void rechercherAnimaux() {
                     continue;
                 }
 
-                int idRecherche=atoi(tampon);
+                int idRecherche = atoi(tampon);
                 if (idRecherche <= 0) {
                     printf(ROUGE_GRAS "❌ ID invalide.\n" REINITIALISER);
                     fclose(fichier);
                     continue;
                 }
 
-               while (fgets(tampon, sizeof(tampon), fichier)) {
+                while (fgets(tampon, sizeof(tampon), fichier)) {
                     commentaire_temp[0] = '\0';
                     if (extraireChamps(tampon, &animal, espece_temp, commentaire_temp)) {
                         if (animal.id == idRecherche) {
                             animal.espece = chaineVersEspece(espece_temp);
                             copierTexte(animal.commentaire, commentaire_temp, TAILLE_COMM);
-                            enleverSautLigne(animal.commentaire, TAILLE_COMM);
+                            enleverSautLigne(animal.commentaire, TAILLE_COMM);  // Appel à la fonction définie dans utils.h
                             int age = calculerAge(animal.annee_naissance);
                             afficherResultat(&animal, age);
                             trouve = 1;
@@ -126,7 +117,7 @@ void rechercherAnimaux() {
                     }
                 }
 
-                if (trouve==NULL) {
+                if (trouve == 0) {
                     printf(JAUNE_GRAS "❓ ID %d non trouvé.\n" REINITIALISER, idRecherche);
                 }
                 break;
@@ -139,7 +130,7 @@ void rechercherAnimaux() {
                     fclose(fichier);
                     return;
                 }
-                enleverSautLigne(tampon, sizeof(tampon));
+                enleverSautLigne(tampon, sizeof(tampon));  // Appel à la fonction définie dans utils.h
 
                 if ((tampon[0] == 'm' || tampon[0] == 'M') && tampon[1] == '\0') { 
                     fclose(fichier);
@@ -165,7 +156,7 @@ void rechercherAnimaux() {
                         if (comparer(animal.nom, nomRecherche)) {
                             animal.espece = chaineVersEspece(espece_temp);
                             copierTexte(animal.commentaire, commentaire_temp, TAILLE_COMM);
-                            enleverSautLigne(animal.commentaire, TAILLE_COMM);
+                            enleverSautLigne(animal.commentaire, TAILLE_COMM);  // Appel à la fonction définie dans utils.h
                             int age = calculerAge(animal.annee_naissance);
                             afficherResultat(&animal, age);
                             trouve++;
@@ -191,7 +182,7 @@ void rechercherAnimaux() {
                     fclose(fichier);
                     return;
                 }
-                enleverSautLigne(tampon, sizeof(tampon));
+                enleverSautLigne(tampon, sizeof(tampon));  // Appel à la fonction définie dans utils.h
 
                 if ((tampon[0] == 'm' || tampon[0] == 'M') && tampon[1] == '\0') { 
                     fclose(fichier);
@@ -202,8 +193,8 @@ void rechercherAnimaux() {
                     continue; 
                 }
 
-                int categ=atoi(tampon);
-               if (categ < 1 || categ > 3) {
+                int categ = atoi(tampon);
+                if (categ < 1 || categ > 3) {
                     printf(ROUGE_GRAS "❌ Catégorie invalide.\n" REINITIALISER);
                     fclose(fichier);
                     continue;
@@ -221,19 +212,17 @@ void rechercherAnimaux() {
                         if (correspond) {
                             animal.espece = chaineVersEspece(espece_temp);
                             copierTexte(animal.commentaire, commentaire_temp, TAILLE_COMM);
-                            enleverSautLigne(animal.commentaire, TAILLE_COMM);
+                            enleverSautLigne(animal.commentaire, TAILLE_COMM);  // Appel à la fonction définie dans utils.h
                             afficherResultat(&animal, age);
                             trouve++;
                         }
                     }
                 }
 
-                if (trouve == 0){
+                if (trouve == 0) {
                     printf(JAUNE_GRAS "❓ Aucun animal trouvé dans cette catégorie.\n" REINITIALISER);
-                     }
-                else{
+                } else {
                     printf(VERT_GRAS "%d animal(aux) trouvé(s) dans la catégorie.\n" REINITIALISER, trouve);
-
                 }
                 break;
             }
