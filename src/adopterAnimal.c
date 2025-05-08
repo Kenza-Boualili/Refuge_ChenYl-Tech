@@ -51,7 +51,7 @@ void adopterAnimal() {
 
     Animal correspondances[MAX_ANIMAUX];
     int nb_correspondances = 0;
-    Animal animal_temporaire;
+ 
 
     char espece_temp_str[50];
     char commentaire_temp_str[TAILLE_COMM];
