@@ -34,7 +34,7 @@ void ajouterAnimal() {
 
         // Nom
         printf(CYAN "📛 Nom : " REINITIALISER);
-        if (!fgets(tampon_saisie, sizeof(tampon_saisie), stdin)) {
+        if (fgets(tampon_saisie, sizeof(tampon_saisie), stdin)==NULL) {
             return;
         }
         enleverSautLigne(tampon_saisie, sizeof(tampon_saisie));
@@ -58,7 +58,7 @@ void ajouterAnimal() {
         // Année de naissance
         while (1) {
             printf(CYAN "📅 Année naissance (1980-%d) : " REINITIALISER, annee_actuelle);
-            if (!fgets(tampon_saisie, sizeof(tampon_saisie), stdin)) {
+            if (fgets(tampon_saisie, sizeof(tampon_saisie), stdin)==NULL) {
                 return;
             }
             enleverSautLigne(tampon_saisie, sizeof(tampon_saisie));
@@ -104,7 +104,7 @@ void ajouterAnimal() {
 
         // Commentaire
         printf(CYAN "🗒️ Commentaire (optionnel, 'r' / 'm') : " REINITIALISER);
-        if (!fgets(tampon_saisie, sizeof(tampon_saisie), stdin)) {
+        if (fgets(tampon_saisie, sizeof(tampon_saisie), stdin)==NULL) {
             return;
         }
         enleverSautLigne(tampon_saisie, sizeof(tampon_saisie));
@@ -120,20 +120,25 @@ void ajouterAnimal() {
         // Vérification des dossiers
         printf("Vérification/Création des dossiers...\n");
 
-        if (mkdir("data", 0755) != 0 && errno != EEXIST) {
-            printf(ROUGE "❌ Erreur création dossier 'data' !\n" REINITIALISER);
-            perror("   Erreur système mkdir");
+        if (mkdir("data", 0755) == -1) {
+        if (errno != EEXIST) {
+        printf("Erreur : impossible de créer le dossier 'data'\n");
+        perror("mkdir data");
         }
-        if (mkdir("data/animaux", 0755) != 0 && errno != EEXIST) {
-            printf(ROUGE "❌ Erreur création dossier 'data/animaux' !\n" REINITIALISER);
-            perror("   Erreur système mkdir");
         }
+    
+    if (mkdir("data/animaux", 0755) == -1) {
+    if (errno != EEXIST) {
+        printf("Erreur : impossible de créer le dossier 'data/animaux'\n");
+        perror("mkdir data/animaux");
+    }
+}
 
-        // Sauvegarde
+    // Sauvegarde
         const char *chemin_fichier = "data/animaux/animaux.txt";
         printf("Ouverture de '%s' en mode ajout...\n", chemin_fichier);
         f = fopen(chemin_fichier, "a");
-        if (!f) {
+        if (f==NULL) {
             printf(ROUGE "❌ Erreur OUVERTURE fichier '%s' pour sauvegarde !\n" REINITIALISER, chemin_fichier);
             perror("   >>> Erreur système retournée par fopen");
             printf(JAUNE_GRAS "   Vérifiez les permissions du dossier 'data/animaux' !\n" REINITIALISER);
@@ -154,4 +159,3 @@ void ajouterAnimal() {
     recommencer_ajout_complet:;
     }
 }
-
