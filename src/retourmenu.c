@@ -11,20 +11,18 @@ int demanderRetourMenu() {
 
     printf("\n" JAUNE "Appuyez sur 'm' + Entrée pour retourner au menu ou juste Entrée pour continuer... " REINITIALISER);
 
-    char *resultat = fgets(tampon, sizeof(tampon), stdin);
-    if (resultat == NULL) {
+    if (!fgets(tampon, sizeof(tampon), stdin)) {
         return 0;
     }
-    
-    if ((tampon[0] == 'm' || tampon[0] == 'M') && tampon[1] == '\n') {
-        return 1;
+
+    for (int i = 0; tampon[i]; i++) {
+        if (tampon[i] == '\n' || tampon[i] == '\r') {
+            tampon[i] = '\0';
+            break;
+        }
     }
 
-    return 0;
-}
-
-    if ((tampon[0] == 'm' || tampon[0] == 'M') &&
-        (tampon[1] == '\n' || (tampon[1] == '\r' && tampon[2] == '\n') || tampon[1] == '\0')) {
+    if ((tampon[0] == 'm' || tampon[0] == 'M') && tampon[1] == '\0') {
         return 1;
     }
 
