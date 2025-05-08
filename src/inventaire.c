@@ -16,7 +16,7 @@
 #define JAUNE_WARN  "\033[33m"
 #define REINITIALISER "\033[0m"
 
-typedef struct {
+typedef struct ResumeEspece {
     const char *nom;
     int nb;
 } ResumeEspece;
@@ -39,37 +39,24 @@ static int calculerAgeInventaire(int annee_naissance) {
     return annee_actuelle - annee_naissance;
 }
 
-static int comparerAnimauxParEspece(const void *p1, const void *p2) {
-    const Animal *a1 = (const Animal *)p1;
-    const Animal *a2 = (const Animal *)p2;
-
-    if (a1->espece < a2->espece){
-        return -1;
-    }
-    if (a1->espece > a2->espece){
-        return 1;
-    }
-    if (a1->id < a2->id){
-        return -1;
-    }
-    if (a1->id > a2->id){
-        return 1;
-    }
-
-    return 0;
-}
-
 static int comparerResumeEspece(const void *a, const void *b) {
     const struct ResumeEspece *ea = (const struct ResumeEspece *)a;
     const struct ResumeEspece *eb = (const struct ResumeEspece *)b;
-    return eb->nb - ea->nb;
+
+    if (ea->nb > eb->nb) {
+        return -1;
+    } else if (ea->nb < eb->nb) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 void afficherInventaire() {
     printf("\n" VERT "=== Inventaire Détaillé par Espèce ===\n" REINITIALISER);
 
     FILE *f = fopen("data/animaux/animaux.txt", "r");
-    if (f==NULL) {
+    if (f == NULL) {
         printf(ROUGE "❌ Erreur fichier '%s'.\n" REINITIALISER, "data/animaux/animaux.txt");
         return;
     }
@@ -90,8 +77,14 @@ void afficherInventaire() {
     while (fgets(ligne, sizeof(ligne), f) && nb_animaux < MAX_ANIMAUX) {
         numero_ligne++;
         tampon_commentaire[0] = '\0';
-      
-    int lus = extraireChamps(ligne, &refuge[nb_animaux], tampon_espece, tampon_commentaire);
+
+        int lus = sscanf(ligne, "%d;%49[^;];%49[^;];%d;%f;%255[^\n]",
+                         &refuge[nb_animaux].id,
+                         refuge[nb_animaux].nom,
+                         tampon_espece,
+                         &refuge[nb_animaux].annee_naissance,
+                         &refuge[nb_animaux].poids,
+                         tampon_commentaire);
 
         if (lus >= 5) {
             refuge[nb_animaux].espece = chaineVersEspece(tampon_espece);
@@ -102,11 +95,11 @@ void afficherInventaire() {
         } else if (longueurChaine(ligne) > 0) {
             printf(JAUNE_WARN "⚠️ Ligne %d mal formatée.\n" REINITIALISER, numero_ligne);
         }
-    }
 
-    if (feof(f) && nb_animaux == MAX_ANIMAUX) {
-        printf(JAUNE_WARN "\nAttention : limite atteinte (%d animaux).\n" REINITIALISER, MAX_ANIMAUX);
-        while (fgets(ligne, sizeof(ligne), f)); // On lit le reste pour vider
+        if (!feof(f) && nb_animaux == MAX_ANIMAUX) {
+            printf(JAUNE_WARN "\nAttention : limite atteinte (%d animaux).\n" REINITIALISER, MAX_ANIMAUX);
+            while (fgets(ligne, sizeof(ligne), f)); // On lit le reste pour vider
+        }
     }
 
     fclose(f);
@@ -130,30 +123,30 @@ void afficherInventaire() {
 
         if (premier || a->espece != espece_precedente) {
             if (premier == 0) {
-            printf("\n");
-        }
+                printf("\n");
+            }
             printf(BLEU "--- %ss ---\n" REINITIALISER, especeVersChaine(a->espece));
             espece_precedente = a->espece;
             premier = 0;
         }
 
         switch (a->espece) {
-        case CHIEN:
-            nb_chien++;
-            break;
-        case CHAT:
-            nb_chat++;
-            break;
-        case HAMSTER:
-            nb_hamster++;
-            break;
-        case AUTRUCHE:
-            nb_autruche++;
-            break;
-        default:
-            nb_inconnu++;
-            break;
-    }
+            case CHIEN:
+                nb_chien++;
+                break;
+            case CHAT:
+                nb_chat++;
+                break;
+            case HAMSTER:
+                nb_hamster++;
+                break;
+            case AUTRUCHE:
+                nb_autruche++;
+                break;
+            default:
+                nb_inconnu++;
+                break;
+        }
 
         int age = calculerAgeInventaire(a->annee_naissance);
 
@@ -162,12 +155,13 @@ void afficherInventaire() {
         printf(ROSE  " Nom : %s\n" REINITIALISER, a->nom);
 
         if (age == -1) {
-        printf(CYAN " Âge : Err\n" REINITIALISER);
-    } else if (age == -2) {
-        printf(CYAN " Âge : Inv\n" REINITIALISER);
-    } else {
-        printf(CYAN " Âge : %d ans\n" REINITIALISER, age);
-    }
+            printf(CYAN " Âge : Err\n" REINITIALISER);
+        } else if (age == -2) {
+            printf(CYAN " Âge : Inv\n" REINITIALISER);
+        } else {
+            printf(CYAN " Âge : %d ans\n" REINITIALISER, age);
+        }
+
         printf(ROUGE  " Poids : %.2f kg\n" REINITIALISER, a->poids);
         printf(BLANC  " Commentaire : %s\n" REINITIALISER, a->commentaire[0] == '\0' ? "Aucun" : a->commentaire);
     }
@@ -176,33 +170,33 @@ void afficherInventaire() {
     printf(ROSE "\n--- Résumé ---\n" REINITIALISER);
 
     ResumeEspece resume[] = {
-    {"Chien", nb_chien},
-    {"Chat", nb_chat},
-    {"Hamster", nb_hamster},
-    {"Autruche", nb_autruche}
-};
-
+        {"Chien", nb_chien},
+        {"Chat", nb_chat},
+        {"Hamster", nb_hamster},
+        {"Autruche", nb_autruche}
+    };
 
     int nb_especes = sizeof(resume) / sizeof(resume[0]);
     qsort(resume, nb_especes, sizeof(struct ResumeEspece), comparerResumeEspece);
 
     for (int i = 0; i < nb_especes; i++) {
-    if (resume[i].nb > 0) {
-        const char *emoji = "";
+        if (resume[i].nb > 0) {
+            const char *emoji = "";
 
-        if (comparer(resume[i].nom, "Chien")) {
-            emoji = "🐕";
-        } else if (comparer(resume[i].nom, "Chat")) {
-            emoji = "🐈";
-        } else if (comparer(resume[i].nom, "Hamster")) {
-            emoji = "🐹";
-        } else if (comparer(resume[i].nom, "Autruche")) {
-            emoji = "🦩";
+            if (comparer(resume[i].nom, "Chien")) {
+                emoji = "🐕";
+            } else if (comparer(resume[i].nom, "Chat")) {
+                emoji = "🐈";
+            } else if (comparer(resume[i].nom, "Hamster")) {
+                emoji = "🐹";
+            } else if (comparer(resume[i].nom, "Autruche")) {
+                emoji = "🦩";
+            }
+
+            printf(VERT "→ " ROSE "%-10s" REINITIALISER " : %d %s\n", resume[i].nom, resume[i].nb, emoji);
         }
-
-        printf(VERT "→ " ROSE "%-10s" REINITIALISER " : %d %s\n", resume[i].nom, resume[i].nb, emoji);
     }
-}
+
     if (nb_inconnu > 0) {
         printf(VERT "→ " ROSE "%-10s" REINITIALISER " : %d ❓\n", "Autres", nb_inconnu);
     }
@@ -211,5 +205,6 @@ void afficherInventaire() {
     printf(ROSE "Total général : %d animaux.\n" REINITIALISER, nb_animaux);
     printf(VERT "-----------------------------\n" REINITIALISER);
 }
+
 
    
