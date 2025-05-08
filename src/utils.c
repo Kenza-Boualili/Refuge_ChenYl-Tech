@@ -29,7 +29,7 @@ size_t longueurChaine(const char *chaine) {
     return longueur;
 }
 
-void copierTexte(char *destination, const char *source, int max_size) {
+void copierTexte(char *destination, const char *source, size_t max_size) {
     size_t i = 0;
     while (source[i] != '\0' && i < max_size - 1) {
         destination[i] = source[i];
@@ -40,7 +40,6 @@ void copierTexte(char *destination, const char *source, int max_size) {
 
 void nettoyerLigne(char *ligne) {
     size_t i = 0;
-
     while (ligne[i]) {
         if (ligne[i] == '\n' || ligne[i] == '\r') {
             ligne[i] = '\0';
@@ -51,7 +50,8 @@ void nettoyerLigne(char *ligne) {
 }
 
 int extraireChamps(char *ligne, Animal *animal, char *especeTemp, char *commentaireTemp) {
-    int champ = 0, index = 0, i = 0;
+    int champ = 0, i = 0;
+    size_t index = 0;
     char morceau[256];
 
     if (ligne == NULL || ligne[0] == '\0') {
