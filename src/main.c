@@ -12,7 +12,7 @@
 #define REINITIALISER "\033[0m"
 
 int main() {
-    nettoyerFichierAnimaux();  // Nettoie les données corrompues au démarrage
+    nettoyerFichierAnimaux();  // Nettoie les données au démarrage
 
     int choix;
 
