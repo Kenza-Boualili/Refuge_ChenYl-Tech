@@ -38,14 +38,13 @@ static int calculerAgeInventaire(int annee_naissance) {
 
     return annee_actuelle - annee_naissance;
 }
-
 static int comparerResumeEspece(const void *a, const void *b) {
     const struct ResumeEspece *ea = (const struct ResumeEspece *)a;
     const struct ResumeEspece *eb = (const struct ResumeEspece *)b;
 
-    if (ea->nb > eb->nb) {
+    if ((*ea).nb > (*eb).nb) {
         return -1;
-    } else if (ea->nb < eb->nb) {
+    } else if ((*ea).nb < (*eb).nb) {
         return 1;
     } else {
         return 0;
@@ -98,7 +97,7 @@ void afficherInventaire() {
 
         if (!feof(f) && nb_animaux == MAX_ANIMAUX) {
             printf(JAUNE_WARN "\nAttention : limite atteinte (%d animaux).\n" REINITIALISER, MAX_ANIMAUX);
-            while (fgets(ligne, sizeof(ligne), f)); // On lit le reste pour vider
+            while (fgets(ligne, sizeof(ligne), f));
         }
     }
 
@@ -121,16 +120,16 @@ void afficherInventaire() {
     for (int i = 0; i < nb_animaux; i++) {
         Animal *a = &refuge[i];
 
-        if (premier || a->espece != espece_precedente) {
+        if (premier || (*a).espece != espece_precedente) {
             if (premier == 0) {
                 printf("\n");
             }
-            printf(BLEU "--- %ss ---\n" REINITIALISER, especeVersChaine(a->espece));
-            espece_precedente = a->espece;
+            printf(BLEU "--- %ss ---\n" REINITIALISER, especeVersChaine((*a).espece));
+            espece_precedente = (*a).espece;
             premier = 0;
         }
 
-        switch (a->espece) {
+        switch ((*a).espece) {
             case CHIEN:
                 nb_chien++;
                 break;
@@ -148,11 +147,11 @@ void afficherInventaire() {
                 break;
         }
 
-        int age = calculerAgeInventaire(a->annee_naissance);
+        int age = calculerAgeInventaire((*a).annee_naissance);
 
         printf(VERT "---\n" REINITIALISER);
-        printf(JAUNE " ID : %d\n" REINITIALISER, a->id);
-        printf(ROSE  " Nom : %s\n" REINITIALISER, a->nom);
+        printf(JAUNE " ID : %d\n" REINITIALISER, (*a).id);
+        printf(ROSE  " Nom : %s\n" REINITIALISER, (*a).nom);
 
         if (age == -1) {
             printf(CYAN " Âge : Err\n" REINITIALISER);
@@ -162,8 +161,8 @@ void afficherInventaire() {
             printf(CYAN " Âge : %d ans\n" REINITIALISER, age);
         }
 
-        printf(ROUGE  " Poids : %.2f kg\n" REINITIALISER, a->poids);
-        printf(BLANC  " Commentaire : %s\n" REINITIALISER, a->commentaire[0] == '\0' ? "Aucun" : a->commentaire);
+        printf(ROUGE  " Poids : %.2f kg\n" REINITIALISER, (*a).poids);
+        printf(BLANC  " Commentaire : %s\n" REINITIALISER, (*a).commentaire[0] == '\0' ? "Aucun" : (*a).commentaire);
     }
 
     printf(VERT "-------------------------------------\n" REINITIALISER);
