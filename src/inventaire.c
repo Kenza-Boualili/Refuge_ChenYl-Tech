@@ -90,14 +90,8 @@ void afficherInventaire() {
     while (fgets(ligne, sizeof(ligne), f) && nb_animaux < MAX_ANIMAUX) {
         numero_ligne++;
         tampon_commentaire[0] = '\0';
-
-        int lus = sscanf(ligne, "%d;%49[^;];%49[^;];%d;%f;%255[^\n]",
-                         &refuge[nb_animaux].id,
-                         refuge[nb_animaux].nom,
-                         tampon_espece,
-                         &refuge[nb_animaux].annee_naissance,
-                         &refuge[nb_animaux].poids,
-                         tampon_commentaire);
+      
+    int lus = extraireChamps(ligne, &refuge[nb_animaux], tampon_espece, tampon_commentaire);
 
         if (lus >= 5) {
             refuge[nb_animaux].espece = chaineVersEspece(tampon_espece);
@@ -110,7 +104,7 @@ void afficherInventaire() {
         }
     }
 
-    if ((feof(f) && nb_animaux == MAX_ANIMAUX)==NULL) {
+    if (feof(f) && nb_animaux == MAX_ANIMAUX) {
         printf(JAUNE_WARN "\nAttention : limite atteinte (%d animaux).\n" REINITIALISER, MAX_ANIMAUX);
         while (fgets(ligne, sizeof(ligne), f)); // On lit le reste pour vider
     }
@@ -135,19 +129,31 @@ void afficherInventaire() {
         Animal *a = &refuge[i];
 
         if (premier || a->espece != espece_precedente) {
-            if (premier==NULL) printf("\n");
+            if (premier == 0) {
+            printf("\n");
+        }
             printf(BLEU "--- %ss ---\n" REINITIALISER, especeVersChaine(a->espece));
             espece_precedente = a->espece;
             premier = 0;
         }
 
         switch (a->espece) {
-            case CHIEN:    nb_chien++; break;
-            case CHAT:     nb_chat++; break;
-            case HAMSTER:  nb_hamster++; break;
-            case AUTRUCHE: nb_autruche++; break;
-            default:       nb_inconnu++; break;
-        }
+        case CHIEN:
+            nb_chien++;
+            break;
+        case CHAT:
+            nb_chat++;
+            break;
+        case HAMSTER:
+            nb_hamster++;
+            break;
+        case AUTRUCHE:
+            nb_autruche++;
+            break;
+        default:
+            nb_inconnu++;
+            break;
+    }
 
         int age = calculerAgeInventaire(a->annee_naissance);
 
@@ -155,10 +161,13 @@ void afficherInventaire() {
         printf(JAUNE " ID : %d\n" REINITIALISER, a->id);
         printf(ROSE  " Nom : %s\n" REINITIALISER, a->nom);
 
-        if (age == -1)      printf(CYAN " Âge : Err\n" REINITIALISER);
-        else if (age == -2) printf(CYAN " Âge : Inv\n" REINITIALISER);
-        else                printf(CYAN " Âge : %d ans\n" REINITIALISER, age);
-
+        if (age == -1) {
+        printf(CYAN " Âge : Err\n" REINITIALISER);
+    } else if (age == -2) {
+        printf(CYAN " Âge : Inv\n" REINITIALISER);
+    } else {
+        printf(CYAN " Âge : %d ans\n" REINITIALISER, age);
+    }
         printf(ROUGE  " Poids : %.2f kg\n" REINITIALISER, a->poids);
         printf(BLANC  " Commentaire : %s\n" REINITIALISER, a->commentaire[0] == '\0' ? "Aucun" : a->commentaire);
     }
@@ -178,18 +187,22 @@ void afficherInventaire() {
     qsort(resume, nb_especes, sizeof(struct ResumeEspece), comparerResumeEspece);
 
     for (int i = 0; i < nb_especes; i++) {
-        if (resume[i].nb > 0) {
-            const char *emoji = "";
+    if (resume[i].nb > 0) {
+        const char *emoji = "";
 
-            if (comparer(resume[i].nom, "Chien"))        emoji = "🐕";
-            else if (comparer(resume[i].nom, "Chat"))    emoji = "🐈";
-            else if (comparer(resume[i].nom, "Hamster")) emoji = "🐹";
-            else if (comparer(resume[i].nom, "Autruche"))emoji = "🦩";
-
-            printf(VERT "→ " ROSE "%-10s" REINITIALISER " : %d %s\n", resume[i].nom, resume[i].nb, emoji);
+        if (comparer(resume[i].nom, "Chien")) {
+            emoji = "🐕";
+        } else if (comparer(resume[i].nom, "Chat")) {
+            emoji = "🐈";
+        } else if (comparer(resume[i].nom, "Hamster")) {
+            emoji = "🐹";
+        } else if (comparer(resume[i].nom, "Autruche")) {
+            emoji = "🦩";
         }
-    }
 
+        printf(VERT "→ " ROSE "%-10s" REINITIALISER " : %d %s\n", resume[i].nom, resume[i].nb, emoji);
+    }
+}
     if (nb_inconnu > 0) {
         printf(VERT "→ " ROSE "%-10s" REINITIALISER " : %d ❓\n", "Autres", nb_inconnu);
     }
