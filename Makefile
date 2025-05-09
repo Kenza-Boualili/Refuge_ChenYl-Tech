@@ -1,33 +1,44 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -Iinclude
-LDFLAGS =
-SRCDIR = src
-INCDIR = include
-OBJDIR = obj
-BINDIR = bin
-DATADIR = data
-SRCS_FILES = main.c animal.c affichage.c ajouterAnimal.c adopterAnimal.c \
-             rechercherAnimaux.c inventaire.c nourriture.c retourmenu.c \
-             utils.c comparer.c id.c nettoyeur.c
-SRCS = $(patsubst %,$(SRCDIR)/%,$(SRCS_FILES))
-OBJS = $(patsubst %,$(OBJDIR)/%.o,$(basename $(SRCS_FILES)))
-TARGET_NAME = chenil
-TARGET = $(BINDIR)/$(TARGET_NAME)
-all: $(TARGET)
-$(TARGET): $(OBJS) | $(BINDIR)
-	    @echo "Linking $(TARGET)..."
-	    $(CC) $(OBJS) $(LDFLAGS) -o $@
-	    @echo "Executable $(TARGET) created."
-$(OBJDIR)/%.o: $(SRCDIR)/%.c $(wildcard $(INCDIR)/*.h) | $(OBJDIR)
-	    @echo "Compiling $<..."
-	    $(CC) $(CFLAGS) -c $< -o $@
-$(BINDIR):
-	    mkdir -p $(BINDIR)
-$(OBJDIR):
-	    mkdir -p $(OBJDIR)
+all: chenil.exe
+
+animal.o: animal.c animal.h
+	gcc -c animal.c -o animal.o
+
+affichage.o: affichage.c affichage.h
+	gcc -c affichage.c -o affichage.o
+
+ajouterAnimal.o: ajouterAnimal.c ajouterAnimal.h
+	gcc -c ajouterAnimal.c -o ajouterAnimal.o
+
+adopterAnimal.o: adopterAnimal.c adopterAnimal.h
+	gcc -c adopterAnimal.c -o adopterAnimal.o
+
+inventaire.o: inventaire.c inventaire.h
+	gcc -c inventaire.c -o inventaire.o
+
+nourriture.o: nourriture.c nourriture.h
+	gcc -c nourriture.c -o nourriture.o
+
+rechercherAnimaux.o: rechercherAnimaux.c rechercherAnimaux.h
+	gcc -c rechercherAnimaux.c -o rechercherAnimaux.o
+
+retourmenu.o: retourmenu.c retourmenu.h
+	gcc -c retourmenu.c -o retourmenu.o
+
+utils.o: utils.c utils.h
+	gcc -c utils.c -o utils.o
+
+nettoyeur.o: nettoyeur.c nettoyeur.h
+	gcc -c nettoyeur.c -o nettoyeur.o
+
+main.o: main.c animal.h ajouterAnimal.h adopterAnimal.h inventaire.h nourriture.h rechercherAnimaux.h retourmenu.h utils.h affichage.h nettoyeur.h
+	gcc -c main.c -o main.o
+
+chenil.exe: main.o animal.o ajouterAnimal.o adopterAnimal.o inventaire.o nourriture.o rechercherAnimaux.o retourmenu.o utils.o affichage.o nettoyeur.o
+	gcc main.o animal.o ajouterAnimal.o adopterAnimal.o inventaire.o nourriture.o rechercherAnimaux.o retourmenu.o utils.o affichage.o nettoyeur.o -o chenil.exe
+
 clean:
-	    @echo "Cleaning build files..."
-	    rm -rf $(OBJDIR)
-	    rm -rf $(BINDIR)
-	    @echo "Clean finished."
-.PHONY: all clean
+	rm -f *.o chenil.exe
+
+cleanfile:
+	rm -f data/animaux/animaux.txt
+	touch data/animaux/animaux.txt
