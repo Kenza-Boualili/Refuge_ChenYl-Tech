@@ -8,6 +8,7 @@ Contenu du projet
 Ce répertoire contient les fichiers suivants :
 
 README.md : Ce fichier que vous êtes en train de lire.
+
 src/ : Répertoire contenant le code source en C pour la gestion des animaux.
 
 include/ : Répertoire contenant les fichiers d'en-tête pour les fonctions utilisées dans le projet.
