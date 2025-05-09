@@ -29,6 +29,7 @@ Assurez-vous que le programme est compilé avec les commandes suivantes :
 Cela va générer les fichiers exécutables nécessaires à l'exécution du programme.
 
 Assurez-vous que les données des animaux sont dans le bon répertoire. Le projet utilise les informations présentes dans le dossier data/animaux/ pour fonctionner correctement. Si vous avez un fichier de données spécifique à ajouter, placez-le dans ce dossier.
+Un outil est également disponible pour nettoyer le fichier animaux.txt automatiquement, afin de garantir qu'il reste propre et bien formaté.
 
 Utilisation:
 Une fois l'installation terminée et la compilation effectuée, vous pouvez lancer le programme avec la commande suivante :
