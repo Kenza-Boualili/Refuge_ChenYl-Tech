@@ -23,7 +23,21 @@ void ajouterAnimal() {
     char tampon_saisie[TAILLE_COMM];
     FILE *f = NULL;
     int annee_actuelle;
-
+int nb_actuels = 0;
+    FILE *f_temp = fopen("data/animaux/animaux.txt", "r");
+    if (f_temp != NULL) {
+        char ligne[512];
+        while (fgets(ligne, sizeof(ligne), f_temp)) {
+            nb_actuels++;
+        }
+        fclose(f_temp);
+    }
+    if (nb_actuels >= MAX_ANIMAUX) {
+        printf(ROUGE "\n🚫 Le refuge est plein ! (%d animaux max)\n" REINITIALISER, MAX_ANIMAUX);
+        printf("Appuyez sur Entrée pour revenir au menu principal...\n");
+        nettoyerTampon();
+        return;
+    }
     time_t t = time(NULL);
     struct tm tm_info = *localtime(&t);
     annee_actuelle = tm_info.tm_year + 1900;
