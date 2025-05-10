@@ -1,4 +1,4 @@
-#include "animal.h"
+#include "../include/animal.h"
 #include <stdio.h>
 
 // Compare deux chaînes sans tenir compte de la casse
