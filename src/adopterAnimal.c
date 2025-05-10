@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "animal.h"
-#include "retourmenu.h"
-#include "utils.h"
-#include "comparer.h"
+#include "../include/animal.h"
+#include "../include/retourmenu.h"
+#include "../include/utils.h"
+#include "../include/comparer.h"
 
 #define ROUGE_GRAS     "\033[1;31m"
 #define VERT_GRAS      "\033[1;32m"
