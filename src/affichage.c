@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "affichage.h"
-#include "animal.h"
+#include "../include/affichage.h"
+#include "../include/animal.h"
 
 #define ROSE    "\033[95m"
 #define JAUNE   "\033[93m"
