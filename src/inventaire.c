@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "animal.h"
-#include "utils.h"
-#include "retourmenu.h"
-#include "comparer.h"
+#include "../include/animal.h"
+#include "../include/utils.h"
+#include "../include/retourmenu.h"
+#include "../include/comparer.h"
 
 #define ROSE        "\033[1;35m"
 #define VERT        "\033[1;32m"
