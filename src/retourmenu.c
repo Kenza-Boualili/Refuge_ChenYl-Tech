@@ -1,6 +1,6 @@
 #include <stdio.h>      
-#include "retourmenu.h" 
-#include "utils.h"       
+#include "../include/retourmenu.h" 
+#include "../include/utils.h"       
 
 #define JAUNE  "\033[1;33m"
 #define REINITIALISER "\033[0m"
