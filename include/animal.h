@@ -1,7 +1,7 @@
 
 #ifndef ANIMAL_H
 #define ANIMAL_H
-#define MAX_ANIMAUX 100
+#define MAX_ANIMAUX 50
 #define TAILLE_COMM 256
 #define TAILLE_NOM 50
 
