@@ -6,11 +6,11 @@
 #include <sys/stat.h>
 #include <errno.h>
 
-#include "comparer.h"
-#include "utils.h"
-#include "animal.h"
-#include "retourmenu.h"
-#include "nourriture.h"  
+#include "../include/comparer.h"
+#include "../include/utils.h"
+#include "../include/animal.h"
+#include "../include/retourmenu.h"
+#include "../include/nourriture.h"  
 
 #define REINITIALISER     "\033[0m"
 #define ROUGE_ERREUR      "\033[1;31m"
