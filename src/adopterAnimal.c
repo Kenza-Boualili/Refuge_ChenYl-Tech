@@ -173,8 +173,12 @@ void adopterAnimal() {
 
                 if (f_entree == NULL || f_sortie == NULL) {
                     printf(ROUGE_GRAS "❌ Erreur fichiers adoption.\n" REINITIALISER);
-                    if (f_entree != NULL) { fclose(f_entree); }
-                    if (f_sortie != NULL) { fclose(f_sortie); }
+                    if (f_entree != NULL) { 
+                        fclose(f_entree); 
+                    }
+                    if (f_sortie != NULL) {
+                        fclose(f_sortie);
+                    }
                     remove("data/animaux/animaux_temp.txt");
                     return;
                 }
