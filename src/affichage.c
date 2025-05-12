@@ -24,18 +24,6 @@ void afficherResultat(const Animal *a, int age_calcule) {
     printf("Âge calculé : %d ans\n", age_calcule);
     printf("Commentaire : %s\n", animal.commentaire);
 }
-// Affiche le sous-menu pour choisir le type d’âge à afficher
-int menuTypeAge(void) {
-    int choix = 0;
-    printf("Afficher :\n");
-    printf("1. Âge réel\n");
-    printf("2. Âge humain\n");
-    printf("Votre choix : ");
-    if (scanf("%d", &choix) != 1) {
-        choix = 1;
-    }
-    return choix;
-}
 
 // Affiche le menu principal
 void afficherMenu() {
